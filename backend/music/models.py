@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.conf import settings
+from django.contrib import admin 
 
 class Release(models.Model):
     RELEASE_TYPES = [
@@ -44,7 +45,7 @@ class Release(models.Model):
     )
     is_featured = models.BooleanField(
         default=False,
-        verbose_name='В избранном'
+        verbose_name='В рекомендациях'
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -109,6 +110,8 @@ class Track(models.Model):
     
     @admin.display(description='Длительность')
     def duration_formatted(self):
+        if not self.duration_seconds:
+            return "--:--"
         minutes = self.duration_seconds // 60
         seconds = self.duration_seconds % 60
         return f"{minutes}:{seconds:02d}"

@@ -5,8 +5,10 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 class Cart(models.Model):
+    """Корзина пользователя"""
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
@@ -45,16 +47,13 @@ class Cart(models.Model):
             return f"Корзина {self.user.email}"
         return f"Корзина {self.session_id}"
     
-    @admin.display(description='Товаров')
-    def items_count(self):
-        return self.items.count()
-    
-    @admin.display(description='Сумма')
+    @property
     def total(self):
-        return sum(item.total_price() for item in self.items.all())
+        return sum(item.total_price for item in self.items.all())
 
 
 class CartItem(models.Model):
+    """Позиция в корзине"""
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
@@ -67,17 +66,10 @@ class CartItem(models.Model):
         related_name='items',
         verbose_name='Корзина'
     )
-    merch_item = models.ForeignKey(
-        'merch.MerchItem', 
+    sku = models.ForeignKey(
+        'merch.SKU', 
         on_delete=models.CASCADE,
-        verbose_name='Товар'
-    )
-    variant = models.ForeignKey(
-        'merch.MerchVariant', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True,
-        verbose_name='Вариант'
+        verbose_name='Товар (SKU)'
     )
     quantity = models.IntegerField(
         default=1, 
@@ -90,22 +82,20 @@ class CartItem(models.Model):
     )
     
     class Meta:
-        verbose_name = 'Элемент корзины'
-        verbose_name_plural = 'Элементы корзины'
-        unique_together = ['cart', 'merch_item', 'variant']
+        verbose_name = 'Позиция корзины'
+        verbose_name_plural = 'Позиции корзины'
+        unique_together = ['cart', 'sku']
     
     def __str__(self):
-        return f"{self.quantity}x {self.merch_item.name}"
+        return f"{self.quantity}x {self.sku.display_name}"
     
-    @admin.display(description='Сумма')
+    @property
     def total_price(self):
-        price = self.merch_item.price
-        if self.variant:
-            price += self.variant.price_adjustment
-        return price * self.quantity
+        return self.sku.price * self.quantity
 
 
 class Order(models.Model):
+    """Заказ"""
     STATUS_CHOICES = [
         ('pending', 'Ожидает оплаты'),
         ('paid', 'Оплачен'),
@@ -132,27 +122,17 @@ class Order(models.Model):
         unique=True,
         verbose_name='Номер заказа'
     )
-    subtotal = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2,
-        verbose_name='Сумма без скидки'
-    )
-    discount_total = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        default=0,
-        verbose_name='Скидка'
-    )
     shipping_cost = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
         default=0,
         verbose_name='Доставка'
     )
-    total = models.DecimalField(
+    discount_total = models.DecimalField(
         max_digits=10, 
-        decimal_places=2,
-        verbose_name='Итого'
+        decimal_places=2, 
+        default=0,
+        verbose_name='Скидка'
     )
     status = models.CharField(
         max_length=20, 
@@ -163,7 +143,6 @@ class Order(models.Model):
     discount_data = models.JSONField(
         default=dict, 
         blank=True, 
-        help_text="Информация о примененных скидках",
         verbose_name='Данные скидок'
     )
     created_at = models.DateTimeField(
@@ -191,12 +170,17 @@ class Order(models.Model):
             self.order_number = f"WLQ-{date_prefix}-{random_suffix}"
         super().save(*args, **kwargs)
     
-    @admin.display(description='Позиций')
-    def item_count(self):
-        return self.items.count()
+    @property
+    def subtotal(self):
+        return sum(item.total for item in self.items.all())
+    
+    @property
+    def total(self):
+        return self.subtotal + self.shipping_cost - self.discount_total
 
 
 class OrderItem(models.Model):
+    """Позиция в заказе (со снэпшотом)"""
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
@@ -209,53 +193,82 @@ class OrderItem(models.Model):
         related_name='items',
         verbose_name='Заказ'
     )
-    merch_item = models.ForeignKey(
-        'merch.MerchItem', 
+    sku = models.ForeignKey(
+        'merch.SKU', 
         on_delete=models.SET_NULL, 
         null=True,
-        verbose_name='Товар'
+        verbose_name='SKU'
     )
-    variant = models.ForeignKey(
-        'merch.MerchVariant', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True,
-        verbose_name='Вариант'
+    c
+    # Снэпшот
+    sku_code = models.CharField(
+        max_length=50,
+        verbose_name='Артикул'
     )
-    item_name = models.CharField(
-        max_length=200, 
-        help_text="Название товара на момент покупки",
+    product_name = models.CharField(
+        max_length=200,
         verbose_name='Название товара'
     )
-    price = models.DecimalField(
+    sku_display_name = models.CharField(
+        max_length=200,
+        verbose_name='Название SKU'
+    )
+    attributes = models.JSONField(
+        default=dict,
+        verbose_name='Характеристики'
+    )
+    unit_price = models.DecimalField(
         max_digits=10, 
-        decimal_places=2, 
-        help_text="Цена на момент покупки",
-        verbose_name='Цена'
+        decimal_places=2,
+        verbose_name='Цена за единицу'
     )
     quantity = models.IntegerField(
+        validators=[MinValueValidator(1)],
         verbose_name='Количество'
     )
-    variant_data = models.JSONField(
-        default=dict, 
-        blank=True, 
-        help_text="Информация о варианте на момент покупки",
-        verbose_name='Данные варианта'
+    image_url = models.URLField(
+        max_length=500, 
+        blank=True,
+        verbose_name='Изображение'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата добавления'
     )
     
     class Meta:
-        verbose_name = 'Элемент заказа'
-        verbose_name_plural = 'Элементы заказа'
+        verbose_name = 'Позиция заказа'
+        verbose_name_plural = 'Позиции заказа'
     
     def __str__(self):
-        return f"{self.quantity}x {self.item_name}"
+        return f"{self.quantity}x {self.sku_display_name}"
     
-    @admin.display(description='Сумма')
+    @property
     def total(self):
-        return self.price * self.quantity
+        """Общая стоимость позиции"""
+        if self.unit_price is None or self.quantity is None:
+            return 0
+        return self.unit_price * self.quantity
+    
+    def save(self, *args, **kwargs):
+        # Всегда заполняем данные из SKU, если они есть
+        if self.sku:
+            self.sku_code = self.sku.sku_code
+            self.product_name = self.sku.product.name
+            self.sku_display_name = self.sku.display_name
+            self.attributes = self.sku.attributes
+            self.unit_price = self.sku.price
+            self.image_url = self.sku.image or self.sku.product.main_image
+        
+        # Проверка, что цена есть
+        if not self.unit_price:
+            raise ValueError("unit_price cannot be null")
+            
+        super().save(*args, **kwargs)
 
 
 class OrderDiscount(models.Model):
+    """Примененная к заказу скидка"""
     id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
@@ -275,8 +288,9 @@ class OrderDiscount(models.Model):
         verbose_name='Промо-код'
     )
     discount_amount = models.DecimalField(
-        max_digits=10, 
+        editable=False, 
         decimal_places=2,
+        max_digits=10,
         verbose_name='Сумма скидки'
     )
     applied_at = models.DateTimeField(
@@ -291,3 +305,8 @@ class OrderDiscount(models.Model):
     
     def __str__(self):
         return f"Скидка {self.discount_amount} для {self.order.order_number}"
+    def save(self, *args, **kwargs):
+        if self.discount_code and self.order:
+            percent = self.discount_code.discount_percent
+            self.discount_amount = (self.order.subtotal * percent) / 100
+        super().save(*args, **kwargs)

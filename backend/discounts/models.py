@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib import admin
 
 class DiscountCode(models.Model):
     id = models.UUIDField(
