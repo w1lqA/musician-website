@@ -2,17 +2,14 @@ from django.contrib import admin
 from django import forms
 from .models import Product, SKU, ProductImage
 
+
 class SKUInline(admin.TabularInline):
     model = SKU
     extra = 1
     fields = ('sku_code', 'display_name', 'price', 'stock', 'is_active')
-    readonly_fields = ('sku_code',)
-    raw_id_fields = ('product',)
-    verbose_name = 'SKU'
-    verbose_name_plural = 'SKU'
-    
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related('product')
+    readonly_fields = ('sku_code', 'display_name')
+    verbose_name = 'Товарная позиция (SKU)'
+    verbose_name_plural = 'Товарные позиции (SKU)'
 
 
 class ProductImageInline(admin.TabularInline):
@@ -35,15 +32,14 @@ class ProductAdmin(admin.ModelAdmin):
     inlines = [SKUInline, ProductImageInline]
     actions = ['activate', 'deactivate']
     readonly_fields = ('created_at', 'updated_at', 'sku_count')
-    
+
     fieldsets = (
         ('Основная информация', {
             'fields': ('name', 'description', 'category')
         }),
-        ('Музыка', {
+        ('Для музыкальных релизов', {
             'fields': ('artist', 'release_date'),
             'classes': ('collapse',),
-            'description': 'Для винила и CD'
         }),
         ('Медиа', {
             'fields': ('main_image',)
@@ -52,16 +48,16 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('is_active', 'created_at', 'updated_at')
         }),
     )
-    
+
     @admin.display(description='Количество SKU')
     def sku_count(self, obj):
         return obj.skus.count()
-    
+
     @admin.action(description='Активировать выбранные товары')
     def activate(self, request, queryset):
         queryset.update(is_active=True)
         self.message_user(request, f"{queryset.count()} товаров активировано")
-    
+
     @admin.action(description='Деактивировать выбранные товары')
     def deactivate(self, request, queryset):
         queryset.update(is_active=False)
@@ -72,10 +68,10 @@ class SKUForm(forms.ModelForm):
     class Meta:
         model = SKU
         fields = '__all__'
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Проверяем, есть ли поле в форме
+        # Поля генерируются автоматически
         if 'sku_code' in self.fields:
             self.fields['sku_code'].required = False
         if 'display_name' in self.fields:
@@ -92,20 +88,21 @@ class SKUAdmin(admin.ModelAdmin):
     list_editable = ('price', 'stock', 'is_active')
     date_hierarchy = 'created_at'
     raw_id_fields = ('product',)
-    readonly_fields = ('sku_code', 'created_at', 'updated_at')
-    autocomplete_fields = ['product']
-    
+    readonly_fields = ('sku_code', 'display_name', 'created_at', 'updated_at')
+    autocomplete_fields = ('product',)
+
     fieldsets = (
         ('Основная информация', {
             'fields': ('product', 'sku_code', 'display_name')
         }),
         ('Характеристики', {
-            'fields': ('attributes',)
+            'fields': ('attributes',),
+            'help_text': 'Формат JSON: {"size": "M", "color": "Black"}'
         }),
         ('Цены и наличие', {
             'fields': ('price', 'compare_at_price', 'stock')
         }),
-        ('Медиа', {
+        ('Изображение', {
             'fields': ('image',)
         }),
         ('Статус', {
@@ -116,10 +113,17 @@ class SKUAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ('product', 'display_order', 'is_primary')
+    list_display = ('product', 'display_order', 'is_primary', 'image_preview')
     list_display_links = ('product',)
     list_filter = ('is_primary',)
     search_fields = ('product__name',)
-    date_hierarchy = 'product__created_at'
     raw_id_fields = ('product',)
     list_editable = ('display_order', 'is_primary')
+
+    @admin.display(description='Превью')
+    def image_preview(self, obj):
+        if obj.image_url:
+            return f'<img src="{obj.image_url}" style="max-height: 50px;" />'
+        return '-'
+
+    image_preview.allow_tags = True

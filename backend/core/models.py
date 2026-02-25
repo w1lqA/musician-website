@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -12,30 +13,32 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(
-        primary_key=True, 
-        default=uuid.uuid4, 
+        primary_key=True,
+        default=uuid.uuid4,
         editable=False,
         verbose_name='ID'
     )
     email = models.EmailField(
         unique=True,
+        db_index=True,
         verbose_name='Email'
     )
     first_name = models.CharField(
-        max_length=100, 
+        max_length=150,
         blank=True,
         verbose_name='Имя'
     )
     last_name = models.CharField(
-        max_length=100, 
+        max_length=150,
         blank=True,
         verbose_name='Фамилия'
     )
@@ -55,38 +58,40 @@ class User(AbstractBaseUser, PermissionsMixin):
         auto_now=True,
         verbose_name='Дата обновления'
     )
-    
+
     objects = UserManager()
-    
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-    
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ['-created_at']
-    
+
     def __str__(self):
         return self.email
-    
+
     @property
     def full_name(self):
-        return f"{self.first_name} {self.last_name}".strip()
+        return f"{self.first_name} {self.last_name}".strip() or self.email
 
 
 class Subscriber(models.Model):
+    """Модель подписчика (справочник)"""
     id = models.UUIDField(
-        primary_key=True, 
-        default=uuid.uuid4, 
+        primary_key=True,
+        default=uuid.uuid4,
         editable=False,
         verbose_name='ID'
     )
     email = models.EmailField(
         unique=True,
+        db_index=True,
         verbose_name='Email'
     )
     subscribed_at = models.DateTimeField(
-        auto_now_add=True,
+        default=timezone.now,
         verbose_name='Дата подписки'
     )
     is_active = models.BooleanField(
@@ -94,20 +99,22 @@ class Subscriber(models.Model):
         verbose_name='Активен'
     )
     unsubscribed_at = models.DateTimeField(
-        null=True, 
+        null=True,
         blank=True,
         verbose_name='Дата отписки'
     )
-    
+
     class Meta:
         verbose_name = 'Подписчик'
         verbose_name_plural = 'Подписчики'
         ordering = ['-subscribed_at']
-    
+
     def __str__(self):
         return self.email
-    
+
     def unsubscribe(self):
-        self.is_active = False
-        self.unsubscribed_at = timezone.now()
-        self.save()
+        """Отписка подписчика"""
+        if self.is_active:
+            self.is_active = False
+            self.unsubscribed_at = timezone.now()
+            self.save()
