@@ -3,8 +3,6 @@ import random
 import string
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.utils import timezone
-
 
 class ActiveProductManager(models.Manager):
     def get_queryset(self):
@@ -132,11 +130,6 @@ class SKU(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name='Остаток'
     )
-    image = models.URLField(
-        max_length=500,
-        blank=True,
-        verbose_name='Изображение'
-    )
     is_active = models.BooleanField(
         default=True,
         verbose_name='Активен'
@@ -227,10 +220,6 @@ class ProductImage(models.Model):
         default=0,
         verbose_name='Порядок отображения'
     )
-    is_primary = models.BooleanField(
-        default=False,
-        verbose_name='Главное'
-    )
 
     class Meta:
         verbose_name = 'Изображение товара'
@@ -239,9 +228,3 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Изображение {self.display_order} для {self.product.name}"
-
-    def save(self, *args, **kwargs):
-        # Если это главное изображение, сбрасываем флаг у других
-        if self.is_primary:
-            ProductImage.objects.filter(product=self.product, is_primary=True).update(is_primary=False)
-        super().save(*args, **kwargs)

@@ -15,7 +15,7 @@ class SKUInline(admin.TabularInline):
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
-    fields = ('image_url', 'display_order', 'is_primary')
+    fields = ('image_url', 'display_order')
     ordering = ('display_order',)
     verbose_name = 'Изображение'
     verbose_name_plural = 'Изображения'
@@ -63,6 +63,9 @@ class ProductAdmin(admin.ModelAdmin):
         queryset.update(is_active=False)
         self.message_user(request, f"{queryset.count()} товаров деактивировано")
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('skus')
+
 
 class SKUForm(forms.ModelForm):
     class Meta:
@@ -97,13 +100,10 @@ class SKUAdmin(admin.ModelAdmin):
         }),
         ('Характеристики', {
             'fields': ('attributes',),
-            'help_text': 'Формат JSON: {"size": "M", "color": "Black"}'
+            'description': 'Формат JSON: {"size": "M", "color": "Black"}'
         }),
         ('Цены и наличие', {
             'fields': ('price', 'compare_at_price', 'stock')
-        }),
-        ('Изображение', {
-            'fields': ('image',)
         }),
         ('Статус', {
             'fields': ('is_active', 'created_at', 'updated_at')
@@ -113,12 +113,12 @@ class SKUAdmin(admin.ModelAdmin):
 
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
-    list_display = ('product', 'display_order', 'is_primary', 'image_preview')
+    list_display = ('product', 'display_order', 'image_preview')
     list_display_links = ('product',)
-    list_filter = ('is_primary',)
+    list_filter = ()
     search_fields = ('product__name',)
     raw_id_fields = ('product',)
-    list_editable = ('display_order', 'is_primary')
+    list_editable = ('display_order',)
 
     @admin.display(description='Превью')
     def image_preview(self, obj):

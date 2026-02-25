@@ -53,6 +53,11 @@ class ReleaseAdmin(admin.ModelAdmin):
         queryset.update(is_featured=False)
         self.message_user(request, f"{queryset.count()} релизов убрано из рекомендаций")
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related(
+            'tracks',
+            'favorited_by'
+        )
 
 @admin.register(Track)
 class TrackAdmin(admin.ModelAdmin):

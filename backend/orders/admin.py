@@ -105,6 +105,9 @@ class OrderAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('user')
+
     @admin.display(description='Сумма товаров')
     def subtotal(self, obj):
         return obj.subtotal
@@ -160,6 +163,9 @@ class OrderItemAdmin(admin.ModelAdmin):
             'fields': ('created_at',)
         }),
     )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('order', 'sku__product')
 
     @admin.display(description='Сумма')
     def total(self, obj):
