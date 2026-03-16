@@ -6,15 +6,16 @@ from django.db.models import Count, Sum, Avg, Max, Min, Q
 from .models import Concert
 from .serializers import ConcertSerializer, TicketSerializer
 
+
 class ConcertViewSet(viewsets.ModelViewSet):
-    queryset = Concert.objects.all()
+    queryset = Concert.objects.all().prefetch_related('tickets')
     serializer_class = ConcertSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['venue', 'city', 'country']
     ordering_fields = ['date', 'price', 'created_at']
 
     def get_queryset(self):
-        queryset = Concert.objects.all()
+        queryset = Concert.objects.all().prefetch_related('tickets')
 
         if self.request.query_params.get('upcoming'):
             queryset = queryset.filter(date__gt=timezone.now())
@@ -30,6 +31,14 @@ class ConcertViewSet(viewsets.ModelViewSet):
 
         if self.request.query_params.get('user_email'):
             queryset = queryset.filter(tickets__user__email=self.request.query_params.get('user_email'))
+
+        if self.request.query_params.get('search'):
+            search = self.request.query_params.get('search')
+            queryset = queryset.filter(
+                Q(venue__icontains=search) |
+                Q(city__icontains=search) |
+                Q(country__icontains=search)
+            )
 
         queryset = queryset.annotate(
             tickets_sold=Count('tickets'),
@@ -58,7 +67,7 @@ class ConcertViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def upcoming(self, request):
-        concerts = Concert.objects.upcoming().annotate(
+        concerts = Concert.objects.upcoming().prefetch_related('tickets').annotate(
             tickets_sold=Count('tickets'),
             revenue=Sum('tickets__price_paid')
         )
@@ -67,7 +76,7 @@ class ConcertViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def past(self, request):
-        concerts = Concert.objects.past().annotate(
+        concerts = Concert.objects.past().prefetch_related('tickets').annotate(
             tickets_sold=Count('tickets'),
             revenue=Sum('tickets__price_paid')
         )
@@ -79,7 +88,7 @@ class ConcertViewSet(viewsets.ModelViewSet):
         city = request.query_params.get('city')
         if not city:
             return Response({'error': 'city parameter required'}, status=400)
-        concerts = Concert.objects.in_city(city).annotate(
+        concerts = Concert.objects.in_city(city).prefetch_related('tickets').annotate(
             tickets_sold=Count('tickets'),
             revenue=Sum('tickets__price_paid')
         )
