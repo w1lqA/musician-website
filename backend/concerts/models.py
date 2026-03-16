@@ -6,8 +6,18 @@ from django.conf import settings
 from django.utils import timezone
 
 
+class ConcertManager(models.Manager):
+    def upcoming(self):
+        return self.filter(date__gt=timezone.now())
+
+    def past(self):
+        return self.filter(date__lt=timezone.now())
+
+    def in_city(self, city):
+        return self.filter(city__iexact=city)
+
+
 class Concert(models.Model):
-    """Концерт"""
     STATUS_CHOICES = [
         ('upcoming', 'Предстоящий'),
         ('soldout', 'Все билеты проданы'),
@@ -69,6 +79,14 @@ class Concert(models.Model):
         verbose_name='Дата создания'
     )
 
+    attendees = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        through='Ticket',
+        related_name='attended_concerts'
+    )
+
+    objects = ConcertManager()
+
     class Meta:
         verbose_name = 'Концерт'
         verbose_name_plural = 'Концерты'
@@ -82,27 +100,21 @@ class Concert(models.Model):
 
     @property
     def available_tickets(self):
-        """Доступно билетов"""
         return self.total_tickets - self.sold_tickets
 
     @property
     def is_sold_out(self):
-        """Распродано ли"""
         return self.available_tickets <= 0
 
     def save(self, *args, **kwargs):
-        """автоматическое обновление статуса"""
-
         if self.sold_tickets >= self.total_tickets:
             self.status = 'soldout'
-
         elif self.date < timezone.now() and self.status not in ['completed', 'cancelled']:
             self.status = 'completed'
-
         super().save(*args, **kwargs)
 
+
 class Ticket(models.Model):
-    """Билет на концерт"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -155,7 +167,6 @@ class Ticket(models.Model):
         super().save(*args, **kwargs)
 
     def _generate_ticket_number(self):
-        """Генерация номера билета"""
         city_code = self.concert.city[:3].upper()
         date_code = self.concert.date.strftime('%d%m')
         random_chars = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
