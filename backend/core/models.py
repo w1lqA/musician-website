@@ -18,7 +18,6 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(
         primary_key=True,
@@ -77,7 +76,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Subscriber(models.Model):
-    """Модель подписчика (справочник)"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -112,7 +110,6 @@ class Subscriber(models.Model):
         return self.email
 
     def unsubscribe(self):
-        """Отписка подписчика"""
         if self.is_active:
             self.is_active = False
             self.unsubscribed_at = timezone.now()

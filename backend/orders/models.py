@@ -8,7 +8,6 @@ from django.utils import timezone
 
 
 class Cart(models.Model):
-    """Корзина пользователя"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -50,17 +49,17 @@ class Cart(models.Model):
 
     @property
     def total(self):
-        """Общая сумма корзины"""
-        return sum(item.total_price for item in self.items.all())
+        items = self.items.all()
+        if not items:
+            return 0
+        return sum(item.total_price for item in items)
 
     @property
     def items_count(self):
-        """Количество товаров"""
         return self.items.count()
 
 
 class CartItem(models.Model):
-    """Позиция в корзине"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -98,12 +97,12 @@ class CartItem(models.Model):
 
     @property
     def total_price(self):
-        """Общая стоимость позиции"""
-        return self.sku.price * self.quantity
+        if self.sku and self.sku.price:
+            return self.sku.price * self.quantity
+        return 0
 
 
 class Order(models.Model):
-    """Заказ"""
     STATUS_CHOICES = [
         ('pending', 'Ожидает оплаты'),
         ('paid', 'Оплачен'),
@@ -180,24 +179,28 @@ class Order(models.Model):
         super().save(*args, **kwargs)
 
     def _generate_order_number(self):
-        """Генерация номера заказа"""
         date_prefix = timezone.now().strftime('%Y%m%d')
         random_suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
         return f"WLQ-{date_prefix}-{random_suffix}"
 
     @property
     def subtotal(self):
-        """Сумма товаров без скидки"""
-        return sum(item.total for item in self.items.all())
+        """сумма товаров без скидки"""
+        items = self.items.all()
+        if not items:
+            return 0
+        return sum(item.total for item in items)
 
     @property
     def total(self):
-        """Итоговая сумма"""
-        return self.subtotal + self.shipping_cost - self.discount_total
+        """итоговая сумма заказа"""
+        subtotal = self.subtotal or 0
+        shipping = self.shipping_cost or 0
+        discount = self.discount_total or 0
+        return subtotal + shipping - discount
 
 
 class OrderItem(models.Model):
-    """Позиция в заказе (со снэпшотом)"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -216,7 +219,6 @@ class OrderItem(models.Model):
         null=True,
         verbose_name='SKU'
     )
-    # Снэпшот данных на момент покупки
     sku_code = models.CharField(
         max_length=50,
         verbose_name='Артикул'
@@ -262,10 +264,11 @@ class OrderItem(models.Model):
     @property
     def total(self):
         """Общая стоимость позиции"""
-        return self.unit_price * self.quantity
+        if self.unit_price and self.quantity:
+            return self.unit_price * self.quantity
+        return 0
 
     def save(self, *args, **kwargs):
-        # Заполняем снэпшот из SKU при создании
         if self.sku and not self.sku_code:
             self.sku_code = self.sku.sku_code
             self.product_name = self.sku.product.name
@@ -277,7 +280,6 @@ class OrderItem(models.Model):
 
 
 class OrderDiscount(models.Model):
-    """Примененная к заказу скидка"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -299,6 +301,7 @@ class OrderDiscount(models.Model):
     discount_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        default=0,
         editable=False,
         verbose_name='Сумма скидки'
     )
@@ -316,8 +319,8 @@ class OrderDiscount(models.Model):
         return f"Скидка {self.discount_amount} для заказа {self.order.order_number}"
 
     def save(self, *args, **kwargs):
-        # Автоматически рассчитываем сумму скидки
         if self.discount_code and self.order and not self.discount_amount:
             percent = self.discount_code.discount_percent
-            self.discount_amount = (self.order.subtotal * percent) / 100
+            subtotal = self.order.subtotal or 0
+            self.discount_amount = (subtotal * percent) / 100
         super().save(*args, **kwargs)

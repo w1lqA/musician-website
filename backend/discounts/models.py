@@ -5,7 +5,7 @@ from datetime import timedelta
 
 
 class DiscountCode(models.Model):
-    """Промо-код (связан с билетом)"""
+    """промокод (связан с билетом)"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -49,14 +49,12 @@ class DiscountCode(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            # Генерируем код из номера билета
             self.code = self.ticket.ticket_number
         if not self.valid_until:
-            # По умолчанию +365 дней
             self.valid_until = timezone.now().date() + timedelta(days=365)
         super().save(*args, **kwargs)
 
     @property
     def is_valid(self):
-        """Проверка, действителен ли код сейчас"""
+        """проверка на действительность промокода"""
         return self.is_active and self.valid_until >= timezone.now().date()

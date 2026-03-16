@@ -8,11 +8,17 @@ class ActiveProductManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_active=True)
 
+    def cheapest_first(self):
+        return self.get_queryset().order_by('skus__price')
+
+    # добавить использования этого cheapest_first
+    # вопросы : 1)модельный менеджер и 2)order_by
+
+
     def in_stock(self):
         return self.get_queryset().filter(skus__stock__gt=0).distinct()
 
 class Product(models.Model):
-    """Товар (абстрактный)"""
     CATEGORIES = [
         ('clothing', 'Одежда'),
         ('accessories', 'Аксессуары'),
@@ -83,7 +89,6 @@ class Product(models.Model):
 
 
 class SKU(models.Model):
-    """Товарная позиция (SKU)"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -160,7 +165,6 @@ class SKU(models.Model):
         super().save(*args, **kwargs)
 
     def _generate_sku_code(self):
-        """Генерация артикула на основе категории и характеристик"""
         prefix = {
             'clothing': 'CLTH',
             'accessories': 'ACCS',
@@ -169,18 +173,15 @@ class SKU(models.Model):
             'other': 'OTH'
         }.get(self.product.category, 'ITEM')
 
-        # Берем первые буквы характеристик
         attrs = self.attributes
         color_code = attrs.get('color', '')[:3].upper() if attrs.get('color') else 'STD'
         size_code = attrs.get('size', '').upper() if attrs.get('size') else 'NOS'
 
-        # Уникальный суффикс
         suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
 
         return f"{prefix}-{color_code}-{size_code}-{suffix}"
 
     def _generate_display_name(self):
-        """Генерация отображаемого названия из товара и характеристик"""
         parts = [self.product.name]
 
         if self.attributes:
@@ -199,7 +200,6 @@ class SKU(models.Model):
 
 
 class ProductImage(models.Model):
-    """Дополнительные изображения товара"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,

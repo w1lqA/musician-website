@@ -5,7 +5,6 @@ from django.urls import reverse
 
 
 class Release(models.Model):
-    """Музыкальный релиз"""
     RELEASE_TYPES = [
         ('album', 'Альбом'),
         ('single', 'Сингл'),
@@ -76,7 +75,6 @@ class Release(models.Model):
 
 
 class Track(models.Model):
-    """Трек в релизе"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -120,14 +118,12 @@ class Track(models.Model):
 
     @property
     def duration_formatted(self):
-        """Форматированная длительность (MM:SS)"""
         minutes = self.duration_seconds // 60
         seconds = self.duration_seconds % 60
         return f"{minutes}:{seconds:02d}"
 
 
 class Favorite(models.Model):
-    """Избранные релизы пользователя (связь многие-ко-многим)"""
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
