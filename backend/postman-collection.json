@@ -1,498 +1,92 @@
 {
   "info": {
-    "name": "musician website api",
+    "name": "musician website merch/music/orders",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "concerts",
+      "name": "merch",
       "item": [
         {
-          "name": "list all concerts",
+          "name": "list products",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/concerts/",
+              "raw": "{{base_url}}/api/products/",
               "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""]
+              "path": ["api", "products", ""]
             }
           }
         },
         {
-          "name": "create concert",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"venue\": \"test venue\",\n  \"city\": \"москва\",\n  \"country\": \"россия\",\n  \"date\": \"2025-12-31T19:00:00+03:00\",\n  \"price\": \"2500.00\",\n  \"status\": \"upcoming\",\n  \"total_tickets\": 200,\n  \"sold_tickets\": 0,\n  \"ticket_url\": \"https://example.com/tickets\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/concerts/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""]
-            }
-          }
-        },
-        {
-          "name": "get concert by id",
+          "name": "filter products by category",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/concerts/{{concert_id}}/",
+              "raw": "{{base_url}}/api/products/?category=t-shirts",
               "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "{{concert_id}}", ""]
+              "path": ["api", "products", ""],
+              "query": [{"key": "category", "value": "t-shirts"}]
             }
           }
         },
         {
-          "name": "update concert",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"venue\": \"updated venue\",\n  \"city\": \"спб\",\n  \"country\": \"россия\",\n  \"date\": \"2025-12-31T19:00:00+03:00\",\n  \"price\": \"3000.00\",\n  \"status\": \"upcoming\",\n  \"total_tickets\": 200,\n  \"sold_tickets\": 50,\n  \"ticket_url\": \"https://example.com/tickets\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/concerts/{{concert_id}}/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "{{concert_id}}", ""]
-            }
-          }
-        },
-        {
-          "name": "delete concert",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/{{concert_id}}/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "{{concert_id}}", ""]
-            }
-          }
-        },
-        {
-          "name": "filter upcoming",
+          "name": "search merch",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/concerts/?upcoming=1",
+              "raw": "{{base_url}}/api/products/?search=oversize",
               "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""],
-              "query": [
-                {
-                  "key": "upcoming",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "filter by city",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/?city=москва",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""],
-              "query": [
-                {
-                  "key": "city",
-                  "value": "москва"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "exclude cancelled",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/?exclude_cancelled=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""],
-              "query": [
-                {
-                  "key": "exclude_cancelled",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "search concerts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/?search=москва",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""],
-              "query": [
-                {
-                  "key": "search",
-                  "value": "москва"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "order by price asc",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/?ordering=price",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""],
-              "query": [
-                {
-                  "key": "ordering",
-                  "value": "price"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "order by date desc",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/?ordering=-date",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", ""],
-              "query": [
-                {
-                  "key": "ordering",
-                  "value": "-date"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "get concert tickets",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/{{concert_id}}/tickets/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "{{concert_id}}", "tickets", ""]
-            }
-          }
-        },
-        {
-          "name": "get concert stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/stats/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "stats", ""]
-            }
-          }
-        },
-        {
-          "name": "get upcoming concerts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/upcoming/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "upcoming", ""]
-            }
-          }
-        },
-        {
-          "name": "get past concerts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/past/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "past", ""]
-            }
-          }
-        },
-        {
-          "name": "get concerts by city",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/by_city/?city=москва",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "by_city", ""],
-              "query": [
-                {
-                  "key": "city",
-                  "value": "москва"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "get cities list",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/cities/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "cities", ""]
-            }
-          }
-        },
-        {
-          "name": "get summary",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/concerts/summary/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "concerts", "summary", ""]
+              "path": ["api", "products", ""],
+              "query": [{"key": "search", "value": "oversize"}]
             }
           }
         }
       ]
     },
     {
-      "name": "core",
+      "name": "music",
       "item": [
         {
-          "name": "list users",
+          "name": "list releases",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/users/",
+              "raw": "{{base_url}}/api/releases/",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", ""]
+              "path": ["api", "releases", ""]
             }
           }
         },
         {
-          "name": "create user",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"first_name\": \"иван\",\n  \"last_name\": \"петров\",\n  \"password\": \"testpass123\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/users/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", ""]
-            }
-          }
-        },
-        {
-          "name": "get user by id",
+          "name": "get featured releases",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/users/{{user_id}}/",
+              "raw": "{{base_url}}/api/releases/featured/",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", "{{user_id}}", ""]
+              "path": ["api", "releases", "featured", ""]
             }
           }
         },
         {
-          "name": "filter active users",
+          "name": "get release tracks",
           "request": {
             "method": "GET",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/users/?active=1",
+              "raw": "{{base_url}}/api/releases/{{release_id}}/",
               "host": ["{{base_url}}"],
-              "path": ["api", "users", ""],
-              "query": [
-                {
-                  "key": "active",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "filter staff users",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/users/?staff=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", ""],
-              "query": [
-                {
-                  "key": "staff",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "search users",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/users/?search=иван",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", ""],
-              "query": [
-                {
-                  "key": "search",
-                  "value": "иван"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "get user stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/users/stats/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "users", "stats", ""]
-            }
-          }
-        },
-        {
-          "name": "list subscribers",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/subscribers/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscribers", ""]
-            }
-          }
-        },
-        {
-          "name": "create subscriber",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"subscriber@example.com\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/subscribers/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscribers", ""]
-            }
-          }
-        },
-        {
-          "name": "unsubscribe",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/subscribers/{{subscriber_id}}/unsubscribe/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscribers", "{{subscriber_id}}", "unsubscribe", ""]
-            }
-          }
-        },
-        {
-          "name": "filter active subscribers",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/subscribers/?active=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscribers", ""],
-              "query": [
-                {
-                  "key": "active",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "get subscriber stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/subscribers/stats/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "subscribers", "stats", ""]
+              "path": ["api", "releases", "{{release_id}}", ""]
             }
           }
         }
       ]
     },
     {
-      "name": "discounts",
+      "name": "orders",
       "item": [
         {
-          "name": "list discounts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""]
-            }
-          }
-        },
-        {
-          "name": "create discount",
+          "name": "create order from cart",
           "request": {
             "method": "POST",
             "header": [
@@ -503,159 +97,35 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"ticket\": \"{{ticket_id}}\",\n  \"code\": \"PROMO123\",\n  \"discount_percent\": 20,\n  \"valid_until\": \"2025-12-31\",\n  \"is_active\": true\n}"
+              "raw": "{}"
             },
             "url": {
-              "raw": "{{base_url}}/api/discounts/",
+              "raw": "{{base_url}}/api/orders/",
               "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""]
-            }
-          }
-        },
-        {
-          "name": "get discount by id",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/{{discount_id}}/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", "{{discount_id}}", ""]
-            }
-          }
-        },
-        {
-          "name": "filter active discounts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/?active=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""],
-              "query": [
-                {
-                  "key": "active",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "filter valid discounts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/?valid=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""],
-              "query": [
-                {
-                  "key": "valid",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "filter expired discounts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/?expired=1",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""],
-              "query": [
-                {
-                  "key": "expired",
-                  "value": "1"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "filter by min percent",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/?min_percent=20",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""],
-              "query": [
-                {
-                  "key": "min_percent",
-                  "value": "20"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "search discounts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/?search=PROMO",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", ""],
-              "query": [
-                {
-                  "key": "search",
-                  "value": "PROMO"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "get discount stats",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/discounts/stats/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "discounts", "stats", ""]
-            }
-          }
-        },
-        {
-          "name": "extend discount",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"days\": 30\n}"
+              "path": ["api", "orders", ""]
             },
+            "description": "Создает заказ для текущего авторизованного пользователя на основе его корзины."
+          }
+        },
+        {
+          "name": "list my orders",
+          "request": {
+            "method": "GET",
             "url": {
-              "raw": "{{base_url}}/api/discounts/{{discount_id}}/extend/",
+              "raw": "{{base_url}}/api/orders/",
               "host": ["{{base_url}}"],
-              "path": ["api", "discounts", "{{discount_id}}", "extend", ""]
+              "path": ["api", "orders", ""]
             }
           }
         },
         {
-          "name": "toggle active",
+          "name": "cancel order",
           "request": {
             "method": "POST",
-            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/discounts/{{discount_id}}/toggle_active/",
+              "raw": "{{base_url}}/api/orders/{{order_id}}/cancel/",
               "host": ["{{base_url}}"],
-              "path": ["api", "discounts", "{{discount_id}}", "toggle_active", ""]
+              "path": ["api", "orders", "{{order_id}}", "cancel", ""]
             }
           }
         }
@@ -668,24 +138,12 @@
       "value": "http://127.0.0.1:8000"
     },
     {
-      "key": "concert_id",
-      "value": ""
+      "key": "release_id",
+      "value": "1"
     },
     {
-      "key": "user_id",
-      "value": ""
-    },
-    {
-      "key": "subscriber_id",
-      "value": ""
-    },
-    {
-      "key": "discount_id",
-      "value": ""
-    },
-    {
-      "key": "ticket_id",
-      "value": ""
+      "key": "order_id",
+      "value": "1"
     }
   ]
 }

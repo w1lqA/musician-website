@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils import timezone
 from .models import Cart, CartItem, Order, OrderItem, OrderDiscount
-
+from django.http import HttpResponse
 
 class CartItemInline(admin.TabularInline):
     model = CartItem
@@ -87,7 +87,7 @@ class OrderAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     inlines = [OrderItemInline, OrderDiscountInline]
     readonly_fields = ('order_number', 'created_at', 'completed_at', 'subtotal', 'total')
-    actions = ['mark_as_paid', 'mark_as_shipped', 'mark_as_delivered', 'mark_as_cancelled']
+    actions = ['mark_as_paid', 'mark_as_shipped', 'mark_as_delivered', 'mark_as_cancelled', 'export_to_pdf']
 
     fieldsets = (
         ('Информация о заказе', {
@@ -137,6 +137,14 @@ class OrderAdmin(admin.ModelAdmin):
         queryset.update(status='cancelled')
         self.message_user(request, f"{queryset.count()} заказов отмечено как отмененные")
 
+    @admin.action(description='Сформировать PDF-чеки')
+    def export_to_pdf(self, request, queryset):
+        # В реальном проекте тут был бы reportlab или weasyprint
+        response = HttpResponse(content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename="orders_report.txt"'
+        for order in queryset:
+            response.write(f"Заказ №{order.order_number}\nСумма: {order.total}\n---\n")
+        return response
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):

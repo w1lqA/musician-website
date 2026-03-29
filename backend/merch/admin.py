@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django import forms
+from django.utils.safestring import mark_safe
+
 from .models import Product, SKU, ProductImage
 
 
@@ -122,8 +124,8 @@ class ProductImageAdmin(admin.ModelAdmin):
 
     @admin.display(description='Превью')
     def image_preview(self, obj):
-        if obj.image_url:
-            return f'<img src="{obj.image_url}" style="max-height: 50px;" />'
-        return '-'
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" width="50" height="50" style="object-fit: contain;" />')
+        return "Нет фото"
 
     image_preview.allow_tags = True

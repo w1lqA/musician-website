@@ -211,9 +211,9 @@ class ProductImage(models.Model):
         related_name='images',
         verbose_name='Товар'
     )
-    image_url = models.URLField(
-        max_length=500,
-        verbose_name='URL изображения'
+    image = models.ImageField(
+        upload_to='products/%Y/%m/',
+        verbose_name='Изображение'
     )
     display_order = models.PositiveIntegerField(
         default=0,

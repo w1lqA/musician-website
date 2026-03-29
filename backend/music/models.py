@@ -32,11 +32,7 @@ class Release(models.Model):
     release_date = models.DateField(
         verbose_name='Дата релиза'
     )
-    cover_url = models.URLField(
-        max_length=500,
-        blank=True,
-        verbose_name='URL обложки'
-    )
+    cover = models.ImageField(upload_to='covers/', blank=True, verbose_name='Обложка')
     description = models.TextField(
         blank=True,
         verbose_name='Описание'
@@ -81,24 +77,25 @@ class Track(models.Model):
         editable=False,
         verbose_name='ID'
     )
+
     release = models.ForeignKey(
         Release,
         on_delete=models.CASCADE,
         related_name='tracks',
         verbose_name='Релиз'
     )
+
     title = models.CharField(
         max_length=200,
         verbose_name='Название'
     )
+
     duration_seconds = models.IntegerField(
         verbose_name='Длительность (секунд)'
     )
-    audio_url = models.URLField(
-        max_length=500,
-        blank=True,
-        verbose_name='URL аудио'
-    )
+
+    file = models.FileField(upload_to='music/', verbose_name='Аудио файл')
+
     track_number = models.PositiveIntegerField(
         verbose_name='Номер трека'
     )
