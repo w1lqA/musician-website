@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { SwiperProps } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
@@ -33,7 +33,6 @@ export default function BaseSlider<T>({
     paginationClickable = true,
     onSlideChange,
 }: BaseSliderProps<T>) {
-    const [swiper, setSwiper] = useState<SwiperType | null>(null);
     const uniqueId = useId().replace(/:/g, '');
 
     const paginationClass = `pagination-${uniqueId}`;
@@ -64,7 +63,6 @@ export default function BaseSlider<T>({
 
             <Swiper
                 modules={[Pagination, Navigation]}
-                onSwiper={setSwiper}
                 onSlideChange={onSlideChange}
                 navigation={showNavigation ? {
                     prevEl: `.${prevClass}`,

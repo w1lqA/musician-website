@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Header } from '@/widgets/header/ui/Header';
 import { Container } from '@/shared/ui/Container';
