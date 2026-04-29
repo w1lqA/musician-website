@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url  # ДОБАВИТЬ ЭТОТ ИМПОРТ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +22,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9-9crxty&+dn4mhp5w20_-%l5n+%-zt=il+29te5u8i(5)z2t5'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-9-9crxty&+dn4mhp5w20_-%l5n+%-zt=il+29te5u8i(5)z2t5')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = []
+# РАЗРЕШАЕМ ВСЕ ХОСТЫ ДЛЯ RAILWAY (ЭТО ВАЖНО)
+ALLOWED_HOSTS = ['*', '.railway.app', '.up.railway.app', 'localhost', '127.0.0.1']
 
+# CSRF ДОВЕРИЕ ДЛЯ ФРОНТА (ОБЯЗАТЕЛЬНО)
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://*.railway.app',
+    'https://*.up.railway.app',
+]
+
+# CORS ДЛЯ ФРОНТА (ЕСЛИ ИСПОЛЬЗУЕШЬ django-cors-headers)
+CORS_ALLOW_ALL_ORIGINS = True  # ПРОСТОЕ РЕШЕНИЕ ДЛЯ СТАРТА
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -39,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',  # ДОБАВИТЬ ЭТОТ APP
 
     'core',
     'music',
@@ -50,6 +64,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ДОБАВИТЬ ЭТУ СТРОКУ (ДЛЯ СТАТИКИ)
+    'corsheaders.middleware.CorsMiddleware',  # ДОБАВИТЬ ЭТУ СТРОКУ (ДЛЯ CORS)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,14 +95,13 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+# Database - АВТОМАТИЧЕСКИ РАБОТАЕТ С POSTGRESQL НА RAILWAY
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 
@@ -122,17 +137,15 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # ДОБАВИТЬ ЭТУ СТРОКУ
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # ДОБАВИТЬ ЭТУ СТРОКУ
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-AUTH_USER_MODEL = 'core.User'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# путь для загрузки файлов (задание 5)
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'core.User'
