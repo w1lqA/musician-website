@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '@/shared/ui/Button';
 import { Container } from '@/shared/ui/Container';
-import heroImage from '@/pages/home/sections/assets/images/hero-img.jpg';
+import heroImage from '@/pages/home/sections/assets/images/hero-img.webp';
 
 type Props = {
     className?: string

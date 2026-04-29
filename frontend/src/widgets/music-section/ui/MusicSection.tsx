@@ -1,9 +1,9 @@
 import { Container } from '@/shared/ui/Container';
 import { Button } from '@/shared/ui/Button';
 
-import albumImg1 from '@/widgets/music-section/assets/images/cassette-1.png';
-import albumImg2 from '@/widgets/music-section/assets/images/cassette-2.png';
-import albumImg3 from '@/widgets/music-section/assets/images/cassette-3.png';
+import albumImg1 from '@/widgets/music-section/assets/images/cassette-1.webp';
+import albumImg2 from '@/widgets/music-section/assets/images/cassette-2.webp';
+import albumImg3 from '@/widgets/music-section/assets/images/cassette-3.webp';
 import BaseSlider from '@/shared/ui/sliders/BaseSlider';
 import { MusicCard } from '@/widgets/music-section/ui/cards/MusicCard';
 
