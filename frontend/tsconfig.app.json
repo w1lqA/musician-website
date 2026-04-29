@@ -5,6 +5,7 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+<<<<<<< Updated upstream
     "types": ["vite/client"],
     "skipLibCheck": true,
 
@@ -15,6 +16,12 @@
       "@app/*": ["src/app/*"],
       "@features/*": ["src/features/*"],
       "@shared/*": ["src/shared/*"]
+=======
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+>>>>>>> Stashed changes
     },
 
     /* Bundler mode */
@@ -24,6 +31,12 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+<<<<<<< Updated upstream
+=======
+    "allowJs": false,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+>>>>>>> Stashed changes
 
     /* Linting */
     "strict": true,
@@ -31,7 +44,15 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
+<<<<<<< Updated upstream
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
 }
+=======
+    "forceConsistentCasingInFileNames": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src", "index.tsx"]
+}
+>>>>>>> Stashed changes

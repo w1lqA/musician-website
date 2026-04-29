@@ -4,7 +4,10 @@
     "target": "ES2023",
     "lib": ["ES2023"],
     "module": "ESNext",
+<<<<<<< Updated upstream
     "types": ["node"],
+=======
+>>>>>>> Stashed changes
     "skipLibCheck": true,
 
     /* Bundler mode */
