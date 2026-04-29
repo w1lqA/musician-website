@@ -9,7 +9,7 @@ export const MerchCard = ({ item }: MerchCardProps) => {
   return (
     <Link
       to={`/merch/${item.id}`}
-      className="bg-primary-black-500 border border-primary-black-300 rounded overflow-hidden flex flex-col transition-transform hover:scale-105"
+      className="bg-primary-black-500 border border-primary-black-300 overflow-hidden flex flex-col transition-transform hover:scale-105"
     >
       <div className="h-48 bg-accent-1 overflow-hidden">
         <img

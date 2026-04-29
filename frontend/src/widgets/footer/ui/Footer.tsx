@@ -1,25 +1,32 @@
+import ArrowRightIcon from '@/shared/assets/icons/ArrowRightIcon';
+import { useScrollToTop } from '@/shared/hooks/useScrollToTop';
+import { Button } from '@/shared/ui/Button';
 import { Container } from '@/shared/ui/Container';
-import { Link } from 'react-router-dom';
 
 export const Footer = () => {
+
+  const scrollToTop = useScrollToTop()
+
   return (
-    <footer className="bg-primary-black-500 py-12 md:py-16">
+    <footer className="bg-primary-black-500 py-8 tablet:py-10">
       <Container>
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex flex-col tablet:flex-row justify-between items-center gap-6">
           <div className="text-caption-regular text-primary-white-400">
-          <p>© 2025 ẃ1lq. Все права защищены.</p>
-          <p>Contact: info@artistname.com</p>
+            <p>© 2025 ẃ1lq. Все права защищены.</p>
+            <p>Contact: info@artistname.com</p>
           </div>
           <div className="flex gap-6">
-            <Link to="/privacy" className="text-caption-regular text-primary-white-400 hover:text-accent-1 transition-colors">
-              Privacy Policy
-            </Link>
-            <Link to="/terms" className="text-caption-regular text-primary-white-400 hover:text-accent-1 transition-colors">
-              Terms of Use
-            </Link>
+            <Button
+              onClick={scrollToTop}
+              className="rounded-full flex items-center justify-center p-0! h-10 w-10"
+              hoverVariant='primaryWhiteBorder'
+            >
+              <ArrowRightIcon className='-rotate-90 w-5 h-5' />
+            </Button>
           </div>
         </div>
       </Container>
+
     </footer>
   );
 };

@@ -7,7 +7,7 @@ interface ContainerProps {
 
 export const Container = ({ children, className = '' }: ContainerProps) => {
   return (
-    <div className={`container-responsive ${className}`}>
+    <div className={`w-full max-w-[clamp(400px,100vw,1440px)] mx-auto px-8 desktop:px-0 ${className}`}>
       {children}
     </div>
   );

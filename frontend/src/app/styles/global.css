@@ -1,9 +1,9 @@
 @import "tailwindcss";
 @import "./fonts.css";
 
-/* ============================================
-   CSS VARIABLES - Цветовая система из Figma
-   ============================================ */
+html {
+    scroll-behavior: smooth;
+}
 
 @theme {
   /* Colors - Accent */
@@ -550,7 +550,8 @@ body {
   font-weight: 400;
   font-size: 16px;
   line-height: 1.4;
-  color: var(--color-primary-black-600);
+  color: var(--color-primary-white-600);
+  background-color: var(--color-primary-black-600);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -573,51 +574,3 @@ button {
   transition: all 300ms ease-in-out;
 }
 
-/* Контейнеры */
-@utility container-mobile {
-  width: 100%;
-  max-width: 375px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-@utility container-tablet {
-  width: 100%;
-  max-width: 768px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 24px;
-  padding-right: 24px;
-}
-
-@utility container-desktop {
-  width: 100%;
-  max-width: 1280px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 32px;
-  padding-right: 32px;
-}
-
-/* Responsive container mixin-like utility */
-@utility container-responsive {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  
-  @media (min-width: 768px) {
-    max-width: 768px;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-  
-  @media (min-width: 1280px) {
-    max-width: 1280px;
-    padding-left: 32px;
-    padding-right: 32px;
-  }
-}
