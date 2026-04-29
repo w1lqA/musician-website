@@ -1,0 +1,263 @@
+/* ============================================
+   TT Fors Display Trial
+   ============================================ */
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: normal;
+  font-weight: 100;
+  src: local('TT Fors Display Trl ExtraLight'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial ExtraLight.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: italic;
+  font-weight: 100;
+  src: local('TT Fors Display Trl ExtraLight Italic'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial ExtraLight Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: normal;
+  font-weight: 200;
+  src: local('TT Fors Display Trl Light'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: italic;
+  font-weight: 200;
+  src: local('TT Fors Display Trl Light Italic'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Light Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: normal;
+  font-weight: 300;
+  src: local('TT Fors Display Trl DemiBold'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial DemiBold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: italic;
+  font-weight: 300;
+  src: local('TT Fors Display Trl DemiBold Italic'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial DemiBold Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: normal;
+  font-weight: 400;
+  src: local('TT Fors Display Trl Regular'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: italic;
+  font-weight: 400;
+  src: local('TT Fors Display Trl Italic'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: normal;
+  font-weight: 500;
+  src: local('TT Fors Display Trl Medium'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: italic;
+  font-weight: 500;
+  src: local('TT Fors Display Trl Medium Italic'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Medium Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: normal;
+  font-weight: 700;
+  src: local('TT Fors Display Trl Bold'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Display Trl';
+  font-style: italic;
+  font-weight: 700;
+  src: local('TT Fors Display Trl Bold Italic'), 
+       url('/fonts/ttfors-display/TT Fors Display Trial Bold Italic.woff') format('woff');
+}
+
+/* ============================================
+   TT Fors Trial (основной)
+   ============================================ */
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 100;
+  src: local('TT Fors Trial Thin'), 
+       url('/fonts/ttfors/TT Fors Trial Thin.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 100;
+  src: local('TT Fors Trial Thin Italic'), 
+       url('/fonts/ttfors/TT Fors Trial Thin Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 200;
+  src: local('TT Fors Trial ExtraLight'), 
+       url('/fonts/ttfors/TT Fors Trial ExtraLight.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 200;
+  src: local('TT Fors Trial ExtraLight Italic'), 
+       url('/fonts/ttfors/TT Fors Trial ExtraLight Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 300;
+  src: local('TT Fors Trial Light'), 
+       url('/fonts/ttfors/TT Fors Trial Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 300;
+  src: local('TT Fors Trial Light Italic'), 
+       url('/fonts/ttfors/TT Fors Trial Light Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 350;
+  src: local('TT Fors Trial DemiBold'), 
+       url('/fonts/ttfors/TT Fors Trial DemiBold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 350;
+  src: local('TT Fors Trial DemiBold Italic'), 
+       url('/fonts/ttfors/TT Fors Trial DemiBold Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 400;
+  src: local('TT Fors Trial Regular'), 
+       url('/fonts/ttfors/TT Fors Trial Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 400;
+  src: local('TT Fors Trial Italic'), 
+       url('/fonts/ttfors/TT Fors Trial Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 500;
+  src: local('TT Fors Trial Medium'), 
+       url('/fonts/ttfors/TT Fors Trial Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 500;
+  src: local('TT Fors Trial Medium Italic'), 
+       url('/fonts/ttfors/TT Fors Trial Medium Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 600;
+  src: local('TT Fors Trial ExtraBold'), 
+       url('/fonts/ttfors/TT Fors Trial ExtraBold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 600;
+  src: local('TT Fors Trial ExtraBold Italic'), 
+       url('/fonts/ttfors/TT Fors Trial ExtraBold Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 700;
+  src: local('TT Fors Trial Bold'), 
+       url('/fonts/ttfors/TT Fors Trial Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 700;
+  src: local('TT Fors Trial Bold Italic'), 
+       url('/fonts/ttfors/TT Fors Trial Bold Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 800;
+  src: local('TT Fors Trial Black'), 
+       url('/fonts/ttfors/TT Fors Trial Black.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 800;
+  src: local('TT Fors Trial Black Italic'), 
+       url('/fonts/ttfors/TT Fors Trial Black Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: normal;
+  font-weight: 900;
+  src: local('TT Fors Black Outline'), 
+       url('/fonts/ttfors/TT Fors Black Outline Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TT Fors Trl';
+  font-style: italic;
+  font-weight: 900;
+  src: local('TT Fors Black Outline Italic'), 
+       url('/fonts/ttfors/TT Fors Black Outline Trial Italic.woff') format('woff');
+}

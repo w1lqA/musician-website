@@ -10,6 +10,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve('./src'),
+      '@shared': path.resolve('./src/shared'),
+      '@features': path.resolve('./src/features'),
+      '@widgets': path.resolve('./src/widgets'),
+      '@pages': path.resolve('./src/pages'),
+      '@entities': path.resolve('./src/entities'),
+
+      '@imports': path.resolve('./src/imports'), // временно оставлю эту директорию для импортов файлов, автосгенерированных фигмой 
     },
   },
 });

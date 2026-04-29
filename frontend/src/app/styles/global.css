@@ -1,1 +1,623 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@import "./fonts.css";
+
+/* ============================================
+   CSS VARIABLES - Цветовая система из Figma
+   ============================================ */
+
+@theme {
+  /* Colors - Accent */
+  --color-accent-1: #A33E44;
+  --color-accent-2: #7B2A30;
+  
+  /* Colors - Primary Black */
+  --color-primary-black-600: #0A0B0D;
+  --color-primary-black-500: #27292C;
+  --color-primary-black-400: #44474A;
+  --color-primary-black-300: #626569;
+  --color-primary-black-200: #7F8387;
+  
+  /* Colors - Primary White */
+  --color-primary-white-600: #F2F2F2;
+  --color-primary-white-500: #E1E2E3;
+  --color-primary-white-400: #D0D2D4;
+  --color-primary-white-300: #BEC1C4;
+  --color-primary-white-200: #ADB1B5;
+  
+  /* Colors - Other */
+  --color-secondary: #9CA1A6;
+  --color-white-background: #F8F6F7;
+  
+  /* Text colors (aliases for semantic usage) */
+  --color-text-primary: #F2F2F2;
+  --color-text-secondary: #0A0B0D;
+
+  /* ============================================
+     TYPOGRAPHY SYSTEM - TT Fors Display Trl
+     ============================================ */
+  
+  /* H1 Display (64px) */
+  --text-h1-display: 64px;
+  --text-h1-display--line-height: 1.2;
+  --text-h1-display--font-family: 'TT Fors Display Trl', sans-serif;
+  --text-h1-display--letter-spacing: normal;
+  
+  /* H2 Display (48px) */
+  --text-h2-display: 48px;
+  --text-h2-display--line-height: 1.2;
+  --text-h2-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* H3 Display (36px) */
+  --text-h3-display: 36px;
+  --text-h3-display--line-height: 1.2;
+  --text-h3-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* H4 Display (28px) */
+  --text-h4-display: 28px;
+  --text-h4-display--line-height: 1.2;
+  --text-h4-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* H5 Display (24px) */
+  --text-h5-display: 24px;
+  --text-h5-display--line-height: 1.2;
+  --text-h5-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* Title 1 Display (20px) */
+  --text-title1-display: 20px;
+  --text-title1-display--line-height: 1.2;
+  --text-title1-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* Title 2 Display (18px) */
+  --text-title2-display: 18px;
+  --text-title2-display--line-height: 1.2;
+  --text-title2-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* Body Display (16px) */
+  --text-body-display: 16px;
+  --text-body-display--line-height: 1.4;
+  --text-body-display--font-family: 'TT Fors Display Trl', sans-serif;
+  
+  /* Caption Display (14px) */
+  --text-caption-display: 14px;
+  --text-caption-display--line-height: 1.4;
+  --text-caption-display--font-family: 'TT Fors Display Trl', sans-serif;
+
+  /* ============================================
+     TYPOGRAPHY SYSTEM - TT Fors Trl (основной)
+     ============================================ */
+  
+  /* H1 (64px) */
+  --text-h1: 64px;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* H2 (48px) */
+  --text-h2: 48px;
+  --text-h2--line-height: 1.2;
+  --text-h2--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* H3 (36px) */
+  --text-h3: 36px;
+  --text-h3--line-height: 1.2;
+  --text-h3--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* H4 (28px) */
+  --text-h4: 28px;
+  --text-h4--line-height: 1.2;
+  --text-h4--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* H5 (24px) */
+  --text-h5: 24px;
+  --text-h5--line-height: 1.2;
+  --text-h5--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* Title 1 (20px) */
+  --text-title1: 20px;
+  --text-title1--line-height: 1.2;
+  --text-title1--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* Title 2 (18px) */
+  --text-title2: 18px;
+  --text-title2--line-height: 1.2;
+  --text-title2--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* Body (16px) */
+  --text-body: 16px;
+  --text-body--line-height: 1.4;
+  --text-body--font-family: 'TT Fors Trl', sans-serif;
+  
+  /* Caption (14px) */
+  --text-caption: 14px;
+  --text-caption--line-height: 1.4;
+  --text-caption--font-family: 'TT Fors Trl', sans-serif;
+
+  /* Breakpoints */
+  --breakpoint-mobile: 375px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1280px;
+  --breakpoint-wide: 1440px;
+}
+
+/* ============================================
+   UTILITY CLASSES для текстовых стилей
+   ============================================ */
+
+/* TT Fors Display Trl - Regular (400) */
+@utility text-h1-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h2-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h3-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h4-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h5-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@utility text-title1-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@utility text-title2-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@utility text-body-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@utility text-caption-display-regular {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* TT Fors Display Trl - Medium (500) */
+@utility text-h1-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h2-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h3-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h4-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h5-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility text-title1-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility text-body-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@utility text-caption-display-medium {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* TT Fors Display Trl - Bold (700) */
+@utility text-h1-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h2-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h3-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h4-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h5-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-title1-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-title2-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-body-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+@utility text-caption-display-bold {
+  font-family: 'TT Fors Display Trl', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* TT Fors Trl - Regular (400) */
+@utility text-h1-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 64px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h2-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h3-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h4-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h5-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@utility text-title1-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@utility text-title2-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@utility text-body-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@utility text-caption-regular {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* TT Fors Trl - Medium (500) */
+@utility text-h1-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h2-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h3-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h4-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h5-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility text-title1-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@utility text-body-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@utility text-caption-medium {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* TT Fors Trl - Bold (700) */
+@utility text-h1-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h2-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h3-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h4-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility text-h5-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-title1-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-title2-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@utility text-body-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+@utility text-caption-bold {
+  font-family: 'TT Fors Trl', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-white-background);
+  font-family: 'TT Fors Trl', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--color-primary-black-600);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Utility классы для кнопок и интерактивных элементов */
+@utility hover-lift {
+  transition: transform 300ms ease-in-out;
+  
+  &:hover {
+    transform: translateY(-4px);
+  }
+}
+
+@utility transition-default {
+  transition: all 300ms ease-in-out;
+}
+
+/* Контейнеры */
+@utility container-mobile {
+  width: 100%;
+  max-width: 375px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@utility container-tablet {
+  width: 100%;
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@utility container-desktop {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* Responsive container mixin-like utility */
+@utility container-responsive {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  
+  @media (min-width: 768px) {
+    max-width: 768px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  
+  @media (min-width: 1280px) {
+    max-width: 1280px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
