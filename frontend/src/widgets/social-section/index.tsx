@@ -1,9 +1,6 @@
 import { Container } from '@/shared/ui/Container';
-import { useState, type HTMLAttributes } from 'react';
+import { type HTMLAttributes } from 'react';
 import clsx from 'clsx';
-import { Input } from '@/shared/ui/inputs/Input';
-import { Button } from '@/shared/ui/Button';
-import ArrowRightIcon from '@/shared/assets/icons/ArrowRightIcon';
 
 // Импорт иконок
 import SpotifyIcon from '@/widgets/social-section/assets/icons/SpotifyIcon';
@@ -11,10 +8,10 @@ import TiktokIcon from '@/widgets/social-section/assets/icons/TiktokIcon';
 import YandexMusicIcon from '@/widgets/social-section/assets/icons/YandexMusicIcon';
 import YouTubeIcon from '@/widgets/social-section/assets/icons/YouTubeIcon';
 import InstagramIcon from '@/widgets/social-section/assets/icons/InstagramIcon';
+import { SubscribeForm } from '@/features/subscribe/hooks/ui/SubscribeForm';
 
 interface SocialSectionProps extends HTMLAttributes<HTMLElement> { }
 
-// Конфиг соцсетей для чистого маппинга
 const SOCIAL_LINKS = [
     { id: 'spotify', platform: 'Spotify', Icon: SpotifyIcon, href: '#' },
     { id: 'tiktok', platform: 'TikTok', Icon: TiktokIcon, href: '#' },
@@ -24,19 +21,12 @@ const SOCIAL_LINKS = [
 ];
 
 export const SocialSection = ({ className, ...props }: SocialSectionProps) => {
-    const [email, setEmail] = useState('');
-
-    const handleSubscribe = () => {
-        console.log('Subscribed:', email);
-    };
-
     return (
         <section
             id="social"
             className={clsx('flex flex-col w-full', className)}
             {...props}
         >
-            {/* Панель иконок */}
             <div className='bg-primary-black-500 py-4 tablet:py-8'>
                 <Container>
                     <div className="flex flex-col tablet:flex-row items-center justify-between gap-8">
@@ -61,7 +51,6 @@ export const SocialSection = ({ className, ...props }: SocialSectionProps) => {
                 </Container>
             </div>
 
-            {/* Блок подписки */}
             <Container className='flex flex-col items-center py-20 tablet:py-24'>
                 <div className="mx-auto text-center space-y-10 flex flex-col items-center max-w-lg">
                     <div className='space-y-4'>
@@ -73,27 +62,7 @@ export const SocialSection = ({ className, ...props }: SocialSectionProps) => {
                         </p>
                     </div>
 
-                    <form
-                        className="flex flex-col tablet:flex-row items-stretch tablet:items-end gap-3 w-full"
-                        onSubmit={(e) => e.preventDefault()}
-                    >
-                        <Input
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className='w-full'
-                        />
-
-                        <Button
-                            onClick={handleSubscribe}
-                            className="rounded-full flex items-center justify-center gap-2 shrink-0 h-10 px-8"
-                            hoverVariant='primaryWhite'
-                        >
-                            Подписаться
-                            <ArrowRightIcon className="w-4 h-4" />
-                        </Button>
-                    </form>
+                    <SubscribeForm />
                 </div>
             </Container>
         </section>

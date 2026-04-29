@@ -8,6 +8,8 @@ interface ButtonProps {
   size?: 'small' | 'medium';
   onClick?: () => void;
   className?: string;
+  disabled?: boolean
+  type?: 'submit' | 'button'
 }
 
 export const Button = ({
@@ -17,6 +19,8 @@ export const Button = ({
   size = 'medium',
   onClick,
   className = '',
+  disabled,
+  type = 'button'
 }: ButtonProps) => {
   const baseStyles = 'text-caption-medium text-center transition-all duration-300 outline-none';
 
@@ -41,7 +45,8 @@ export const Button = ({
 
   return (
     <button
-      type="button"
+      disabled={disabled}
+      type={type}
       onClick={onClick}
       className={clsx(
         baseStyles,
