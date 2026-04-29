@@ -139,7 +139,6 @@ class OrderAdmin(admin.ModelAdmin):
 
     @admin.action(description='Сформировать PDF-чеки')
     def export_to_pdf(self, request, queryset):
-        # В реальном проекте тут был бы reportlab или weasyprint
         response = HttpResponse(content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="orders_report.txt"'
         for order in queryset:

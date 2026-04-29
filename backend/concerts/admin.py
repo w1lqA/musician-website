@@ -17,6 +17,7 @@ class TicketInline(admin.TabularInline):
         return False
 
 
+
 @admin.register(Concert)
 class ConcertAdmin(admin.ModelAdmin):
     list_display = ('venue', 'city', 'date', 'price', 'status', 'sold_tickets', 'available_tickets', 'is_sold_out')

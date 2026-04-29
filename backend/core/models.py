@@ -48,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         verbose_name='Персонал'
     )
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата регистрации'

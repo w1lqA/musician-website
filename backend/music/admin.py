@@ -5,7 +5,7 @@ from .models import Release, Track, Favorite
 class TrackInline(admin.TabularInline):
     model = Track
     extra = 1
-    fields = ('track_number', 'title', 'duration_seconds', 'duration_formatted', 'audio_url')
+    fields = ('track_number', 'title', 'duration_seconds', 'duration_formatted', 'file')
     readonly_fields = ('duration_formatted',)
     ordering = ('track_number',)
     verbose_name = 'Трек'
@@ -74,7 +74,7 @@ class TrackAdmin(admin.ModelAdmin):
             'fields': ('release', 'title', 'track_number')
         }),
         ('Аудио', {
-            'fields': ('duration_seconds', 'duration_formatted', 'audio_url')
+            'fields': ('duration_seconds', 'duration_formatted', 'file')
         }),
         ('Системное', {
             'fields': ('created_at',)

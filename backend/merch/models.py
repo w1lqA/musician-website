@@ -11,8 +11,7 @@ class ActiveProductManager(models.Manager):
     def cheapest_first(self):
         return self.get_queryset().order_by('skus__price')
 
-    # добавить использования этого cheapest_first
-    # вопросы : 1)модельный менеджер и 2)order_by
+    # вопросы : 1)модельный менеджер и 2) order_by
 
     def in_stock(self):
         return self.get_queryset().filter(skus__stock__gt=0).distinct()
