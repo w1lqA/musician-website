@@ -4,6 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'concerts', views.ConcertViewSet)
+router.register(r'cities', views.CityViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

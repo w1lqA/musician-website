@@ -1,10 +1,13 @@
+# discounts/views.py
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from django.utils import timezone
 from django.db.models import Q, Count, Avg
 from .models import DiscountCode
 from .serializers import DiscountCodeSerializer
+from core.permissions import IsAdminOrReadOnly
 
 
 class DiscountCodeViewSet(viewsets.ModelViewSet):
@@ -13,9 +16,14 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['code', 'ticket__ticket_number', 'ticket__user__email']
     ordering_fields = ['created_at', 'valid_until', 'discount_percent']
+    permission_classes = [IsAdminOrReadOnly]  # Только админы могут управлять промокодами
 
     def get_queryset(self):
         queryset = DiscountCode.objects.all().select_related('ticket__user')
+
+        # Обычные пользователи видят только свои промокоды
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(ticket__user=self.request.user)
 
         if self.request.query_params.get('active'):
             queryset = queryset.filter(is_active=True)
@@ -38,7 +46,7 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[IsAdminUser])
     def stats(self, request):
         now = timezone.now().date()
         stats = DiscountCode.objects.aggregate(
@@ -50,7 +58,7 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
         )
         return Response(stats)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
     def extend(self, request, pk=None):
         code = self.get_object()
         days = request.data.get('days', 30)
@@ -59,7 +67,7 @@ class DiscountCodeViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(code)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
     def toggle_active(self, request, pk=None):
         code = self.get_object()
         code.is_active = not code.is_active

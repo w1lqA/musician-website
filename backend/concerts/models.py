@@ -17,6 +17,46 @@ class ConcertManager(models.Manager):
         return self.filter(city__iexact=city)
 
 
+
+class City(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        verbose_name='ID'
+    )
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        db_index=True,
+        verbose_name='Название города'
+    )
+    slug = models.SlugField(
+        max_length=100,
+        unique=True,
+        db_index=True,
+        verbose_name='Слаг (для URL)'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата создания'
+    )
+
+    class Meta:
+        verbose_name = 'Город'
+        verbose_name_plural = 'Города'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class Concert(models.Model):
     STATUS_CHOICES = [
         ('upcoming', 'Предстоящий'),
@@ -36,9 +76,10 @@ class Concert(models.Model):
         db_index=True,
         verbose_name='Площадка'
     )
-    city = models.CharField(
-        max_length=100,
-        db_index=True,
+    city = models.ForeignKey(
+        City,
+        on_delete=models.CASCADE,
+        related_name='concerts',
         verbose_name='Город'
     )
     country = models.CharField(
@@ -167,7 +208,7 @@ class Ticket(models.Model):
         super().save(*args, **kwargs)
 
     def _generate_ticket_number(self):
-        city_code = self.concert.city[:3].upper()
+        city_code = self.concert.city.name[:3].upper()
         date_code = self.concert.date.strftime('%d%m')
         random_chars = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
         return f"WLQ-{city_code}-{date_code}-{random_chars}"

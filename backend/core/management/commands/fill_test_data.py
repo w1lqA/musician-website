@@ -1,3 +1,4 @@
+# core/management/commands/fill_test_data.py
 import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -5,7 +6,7 @@ from datetime import timedelta, date
 from django.contrib.auth import get_user_model
 from django.db import transaction
 
-from merch.models import Product, SKU, ProductImage
+from merch.models import Product, SKU
 from music.models import Release, Track, Favorite
 from concerts.models import Concert, Ticket
 from discounts.models import DiscountCode
@@ -16,16 +17,14 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = 'Заполняет базу тестовыми данными для всех приложений'
+    help = 'заполняет базу тестовыми данными для всех приложений'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write('Начинаем заполнение тестовыми данными...')
+        self.stdout.write('начинаем заполнение тестовыми данными...')
 
-        # Очищаем существующие данные
         self.clean_data()
 
-        # Создаем данные в правильном порядке
-        with transaction.atomic():  # Добавляем транзакцию для целостности
+        with transaction.atomic():
             users = self.create_users()
             subscribers = self.create_subscribers(users)
             releases = self.create_releases()
@@ -42,13 +41,11 @@ class Command(BaseCommand):
             order_items = self.create_order_items(orders, skus)
             order_discounts = self.create_order_discounts(orders, discount_codes)
 
-        self.stdout.write(self.style.SUCCESS('✅ Все тестовые данные успешно созданы!'))
+        self.stdout.write(self.style.SUCCESS('все тестовые данные успешно созданы'))
 
     def clean_data(self):
-        """Очистка всех данных"""
-        self.stdout.write('Очищаем существующие данные...')
+        self.stdout.write('очищаем существующие данные...')
 
-        # Порядок важен из-за внешних ключей
         OrderDiscount.objects.all().delete()
         OrderItem.objects.all().delete()
         Order.objects.all().delete()
@@ -62,19 +59,15 @@ class Command(BaseCommand):
         Release.objects.all().delete()
         SKU.objects.all().delete()
         Product.objects.all().delete()
-        ProductImage.objects.all().delete()
         Subscriber.objects.all().delete()
-        # Пользователей не удаляем, но они создаются заново в create_users()
         User.objects.filter(is_superuser=False).delete()
 
-        self.stdout.write('✅ Данные очищены')
+        self.stdout.write('данные очищены')
 
     def create_users(self, count=5):
-        """Создание тестовых пользователей"""
-        self.stdout.write('Создаем пользователей...')
+        self.stdout.write('создаем пользователей...')
         users = []
 
-        # Админ
         admin, created = User.objects.get_or_create(
             email='admin@example.com',
             defaults={
@@ -89,7 +82,6 @@ class Command(BaseCommand):
             admin.save()
         users.append(admin)
 
-        # Обычные пользователи
         for i in range(1, count):
             email = f'user{i}@example.com'
             user, created = User.objects.get_or_create(
@@ -105,15 +97,13 @@ class Command(BaseCommand):
                 user.save()
             users.append(user)
 
-        self.stdout.write(f'✅ Создано {len(users)} пользователей')
+        self.stdout.write(f'создано {len(users)} пользователей')
         return users
 
     def create_subscribers(self, users):
-        """Создание подписчиков"""
-        self.stdout.write('Создаем подписчиков...')
+        self.stdout.write('создаем подписчиков...')
         subscribers = []
 
-        # Подписчики из пользователей
         for user in users[:3]:
             sub, created = Subscriber.objects.get_or_create(
                 email=user.email,
@@ -124,7 +114,6 @@ class Command(BaseCommand):
             )
             subscribers.append(sub)
 
-        # Дополнительные email-подписчики
         extra_emails = [
             'fan1@mail.ru',
             'fan2@yandex.ru',
@@ -143,12 +132,11 @@ class Command(BaseCommand):
             )
             subscribers.append(sub)
 
-        self.stdout.write(f'✅ Создано {len(subscribers)} подписчиков')
+        self.stdout.write(f'создано {len(subscribers)} подписчиков')
         return subscribers
 
     def create_releases(self, count=5):
-        """Создание музыкальных релизов"""
-        self.stdout.write('Создаем релизы...')
+        self.stdout.write('создаем релизы...')
         releases = []
 
         release_data = [
@@ -156,35 +144,35 @@ class Command(BaseCommand):
                 'title': 'Ночной полет',
                 'artist': 'Электрофорез',
                 'type': 'album',
-                'description': 'Дебютный альбом в жанре синти-поп',
+                'description': 'дебютный альбом в жанре синти-поп',
                 'is_featured': True
             },
             {
                 'title': 'Первая любовь',
                 'artist': 'Молчат дома',
                 'type': 'single',
-                'description': 'Новый сингл',
+                'description': 'новый сингл',
                 'is_featured': True
             },
             {
                 'title': 'Круги на воде',
                 'artist': 'Sirotkin',
                 'type': 'ep',
-                'description': 'Акустический EP',
+                'description': 'акустический ep',
                 'is_featured': False
             },
             {
                 'title': 'Без названия',
                 'artist': 'Перемотка',
                 'type': 'album',
-                'description': 'Студийный альбом',
+                'description': 'студийный альбом',
                 'is_featured': True
             },
             {
                 'title': 'Зима в сердце',
                 'artist': 'ГШ',
                 'type': 'single',
-                'description': 'Зимний сингл',
+                'description': 'зимний сингл',
                 'is_featured': False
             }
         ]
@@ -197,16 +185,15 @@ class Command(BaseCommand):
                 description=data['description'],
                 is_featured=data['is_featured'],
                 release_date=date.today() - timedelta(days=random.randint(30, 365)),
-                cover_url=f"https://example.com/covers/release_{i + 1}.jpg"
+                cover=f"https://picsum.photos/seed/release_{i+1}/400/400"
             )
             releases.append(release)
 
-        self.stdout.write(f'✅ Создано {len(releases)} релизов')
+        self.stdout.write(f'создано {len(releases)} релизов')
         return releases
 
     def create_tracks(self, releases):
-        """Создание треков для релизов"""
-        self.stdout.write('Создаем треки...')
+        self.stdout.write('создаем треки...')
         tracks = []
 
         for release in releases:
@@ -218,16 +205,15 @@ class Command(BaseCommand):
                     title=f'Трек {j}',
                     duration_seconds=random.randint(120, 300),
                     track_number=j,
-                    audio_url=f"https://example.com/audio/{release.id}/track_{j}.mp3"
+                    file=f"https://example.com/audio/{release.id}/track_{j}.mp3"
                 )
                 tracks.append(track)
 
-        self.stdout.write(f'✅ Создано {len(tracks)} треков')
+        self.stdout.write(f'создано {len(tracks)} треков')
         return tracks
 
     def create_favorites(self, users, releases):
-        """Создание избранных релизов"""
-        self.stdout.write('Создаем избранное...')
+        self.stdout.write('создаем избранное...')
         favorites = []
 
         for user in users[:3]:
@@ -241,12 +227,11 @@ class Command(BaseCommand):
                 )
                 favorites.append(fav)
 
-        self.stdout.write(f'✅ Создано {len(favorites)} избранных')
+        self.stdout.write(f'создано {len(favorites)} избранных')
         return favorites
 
     def create_concerts(self, count=4):
-        """Создание концертов"""
-        self.stdout.write('Создаем концерты...')
+        self.stdout.write('создаем концерты...')
         concerts = []
 
         concert_data = [
@@ -283,19 +268,18 @@ class Command(BaseCommand):
                 country='Россия',
                 date=timezone.now() + timedelta(days=random.randint(10, 90)),
                 price=random.randint(1000, 3000),
-                ticket_url=f"https://tickets.example.com/concert_{i + 1}",
+                ticket_url=f"https://tickets.example.com/concert_{i+1}",
                 status=data['status'],
                 total_tickets=data['total_tickets'],
                 sold_tickets=random.randint(50, data['total_tickets'])
             )
             concerts.append(concert)
 
-        self.stdout.write(f'✅ Создано {len(concerts)} концертов')
+        self.stdout.write(f'создано {len(concerts)} концертов')
         return concerts
 
     def create_tickets(self, concerts, users):
-        """Создание билетов на концерты"""
-        self.stdout.write('Создаем билеты...')
+        self.stdout.write('создаем билеты...')
         tickets = []
 
         for concert in concerts[:2]:
@@ -309,17 +293,15 @@ class Command(BaseCommand):
                 )
                 tickets.append(ticket)
 
-        self.stdout.write(f'✅ Создано {len(tickets)} билетов')
+        self.stdout.write(f'создано {len(tickets)} билетов')
         return tickets
 
     def create_discount_codes(self, tickets):
-        """Создание промо-кодов из билетов"""
-        self.stdout.write('Создаем промо-коды...')
+        self.stdout.write('создаем промо-коды...')
         codes = []
 
         for ticket in tickets:
             if random.choice([True, False]):
-                # Не передаем code и valid_until - они сгенерируются автоматически
                 code = DiscountCode.objects.create(
                     ticket=ticket,
                     discount_percent=15,
@@ -327,54 +309,53 @@ class Command(BaseCommand):
                 )
                 codes.append(code)
 
-        self.stdout.write(f'✅ Создано {len(codes)} промо-кодов')
+        self.stdout.write(f'создано {len(codes)} промо-кодов')
         return codes
 
     def create_products(self):
-        """Создание товаров (Product)"""
-        self.stdout.write('Создаем товары...')
+        self.stdout.write('создаем товары...')
         products = []
 
         products_data = [
             {
                 'name': 'Футболка с логотипом',
                 'category': 'clothing',
-                'description': 'Хлопковая футболка с принтом',
-                'main_image': 'https://example.com/images/tshirt.jpg',
+                'description': 'хлопковая футболка с принтом',
+                'main_image': 'https://picsum.photos/seed/tshirt/400/400',
                 'artist': 'w1lq',
             },
             {
                 'name': 'Худи оверсайз',
                 'category': 'clothing',
-                'description': 'Теплое худи с капюшоном',
-                'main_image': 'https://example.com/images/hoodie.jpg',
+                'description': 'теплое худи с капюшоном',
+                'main_image': 'https://picsum.photos/seed/hoodie/400/400',
                 'artist': 'w1lq',
             },
             {
                 'name': 'Значок',
                 'category': 'accessories',
-                'description': 'Металлический значок 3см',
-                'main_image': 'https://example.com/images/pin.jpg',
+                'description': 'металлический значок 3см',
+                'main_image': 'https://picsum.photos/seed/pin/400/400',
             },
             {
                 'name': 'Шопер',
                 'category': 'accessories',
-                'description': 'Экосумка из хлопка',
-                'main_image': 'https://example.com/images/tote.jpg',
+                'description': 'эко-сумка из хлопка',
+                'main_image': 'https://picsum.photos/seed/tote/400/400',
             },
             {
                 'name': 'Винил "Ночной полет"',
                 'category': 'vinyl',
-                'description': 'Виниловая пластинка 12"',
-                'main_image': 'https://example.com/images/vinyl.jpg',
+                'description': 'виниловая пластинка 12"',
+                'main_image': 'https://picsum.photos/seed/vinyl/400/400',
                 'artist': 'Электрофорез',
                 'release_date': date.today() - timedelta(days=30),
             },
             {
                 'name': 'CD "Первая любовь"',
                 'category': 'cd',
-                'description': 'Компакт-диск в диджипаке',
-                'main_image': 'https://example.com/images/cd.jpg',
+                'description': 'компакт-диск в диджипаке',
+                'main_image': 'https://picsum.photos/seed/cd/400/400',
                 'artist': 'Молчат дома',
                 'release_date': date.today() - timedelta(days=60),
             }
@@ -392,16 +373,14 @@ class Command(BaseCommand):
             )
             products.append(product)
 
-        self.stdout.write(f'✅ Создано {len(products)} товаров')
+        self.stdout.write(f'создано {len(products)} товаров')
         return products
 
     def create_skus(self, products):
-        """Создание SKU для товаров"""
-        self.stdout.write('Создаем SKU...')
+        self.stdout.write('создаем sku...')
         skus = []
 
         sku_configs = [
-            # (индекс продукта, список атрибутов, базовая цена)
             (0, [{'size': 'S', 'color': 'Black'}, {'size': 'M', 'color': 'Black'},
                  {'size': 'L', 'color': 'White'}, {'size': 'XL', 'color': 'White'}], 2500),
             (1, [{'size': 'S', 'color': 'Black'}, {'size': 'M', 'color': 'Gray'},
@@ -425,12 +404,11 @@ class Command(BaseCommand):
                 )
                 skus.append(sku)
 
-        self.stdout.write(f'✅ Создано {len(skus)} SKU')
+        self.stdout.write(f'создано {len(skus)} sku')
         return skus
 
     def create_carts(self, users):
-        """Создание корзин для пользователей"""
-        self.stdout.write('Создаем корзины...')
+        self.stdout.write('создаем корзины...')
         carts = []
 
         for user in users:
@@ -442,21 +420,19 @@ class Command(BaseCommand):
             )
             carts.append(cart)
 
-        # Гостевая корзина
         guest_cart = Cart.objects.create(
             session_id=f"guest_{random.randint(1000, 9999)}"
         )
         carts.append(guest_cart)
 
-        self.stdout.write(f'✅ Создано {len(carts)} корзин')
+        self.stdout.write(f'создано {len(carts)} корзин')
         return carts
 
     def create_cart_items(self, carts, skus):
-        """Создание позиций в корзинах"""
-        self.stdout.write('Создаем позиции в корзинах...')
+        self.stdout.write('создаем позиции в корзинах...')
         cart_items = []
 
-        for cart in carts[:3]:  # Берем первые 3 корзины
+        for cart in carts[:3]:
             for sku in random.sample(skus, min(2, len(skus))):
                 cart_item = CartItem.objects.create(
                     cart=cart,
@@ -465,12 +441,11 @@ class Command(BaseCommand):
                 )
                 cart_items.append(cart_item)
 
-        self.stdout.write(f'✅ Создано {len(cart_items)} позиций в корзинах')
+        self.stdout.write(f'создано {len(cart_items)} позиций в корзинах')
         return cart_items
 
     def create_orders(self, users, count=10):
-        """Создание заказов"""
-        self.stdout.write('Создаем заказы...')
+        self.stdout.write('создаем заказы...')
         orders = []
 
         statuses = ['pending', 'paid', 'shipped', 'delivered', 'cancelled']
@@ -480,11 +455,10 @@ class Command(BaseCommand):
             days_ago = random.randint(0, 60)
             status = random.choice(statuses)
 
-            # Создаем заказ без discount_total - он будет рассчитан из OrderDiscount
             order = Order.objects.create(
                 user=user,
                 shipping_cost=random.choice([0, 300, 500]),
-                discount_total=0,  # Начальное значение, обновится из OrderDiscount
+                discount_total=0,
                 status=status,
                 discount_data={},
                 created_at=timezone.now() - timedelta(days=days_ago),
@@ -492,16 +466,14 @@ class Command(BaseCommand):
             )
             orders.append(order)
 
-        self.stdout.write(f'✅ Создано {len(orders)} заказов')
+        self.stdout.write(f'создано {len(orders)} заказов')
         return orders
 
     def create_order_items(self, orders, skus):
-        """Создание позиций в заказах"""
-        self.stdout.write('Создаем позиции в заказах...')
+        self.stdout.write('создаем позиции в заказах...')
         order_items = []
 
         for order in orders:
-            # Создаем 1-3 позиции в каждом заказе
             for sku in random.sample(skus, random.randint(1, 3)):
                 order_item = OrderItem.objects.create(
                     order=order,
@@ -510,28 +482,24 @@ class Command(BaseCommand):
                 )
                 order_items.append(order_item)
 
-        self.stdout.write(f'✅ Создано {len(order_items)} позиций в заказах')
+        self.stdout.write(f'создано {len(order_items)} позиций в заказах')
         return order_items
 
     def create_order_discounts(self, orders, discount_codes):
-        """Создание скидок на заказы"""
-        self.stdout.write('Создаем скидки на заказы...')
+        self.stdout.write('создаем скидки на заказы...')
         order_discounts = []
 
-        # Применяем скидки к некоторым заказам
-        for order in orders[:5]:  # Первые 5 заказов
+        for order in orders[:5]:
             if discount_codes and random.choice([True, False]):
                 code = random.choice(discount_codes)
-                # Не передаем discount_amount - он рассчитается автоматически
                 discount = OrderDiscount.objects.create(
                     order=order,
                     discount_code=code
                 )
                 order_discounts.append(discount)
 
-                # Обновляем discount_total в заказе
                 order.discount_total = discount.discount_amount
                 order.save()
 
-        self.stdout.write(f'✅ Создано {len(order_discounts)} скидок на заказы')
+        self.stdout.write(f'создано {len(order_discounts)} скидок на заказы')
         return order_discounts

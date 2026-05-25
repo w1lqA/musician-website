@@ -1,3 +1,4 @@
+# orders/models.py
 import uuid
 import random
 import string
@@ -185,7 +186,6 @@ class Order(models.Model):
 
     @property
     def subtotal(self):
-        """сумма товаров без скидки"""
         items = self.items.all()
         if not items:
             return 0
@@ -193,7 +193,6 @@ class Order(models.Model):
 
     @property
     def total(self):
-        """итоговая сумма заказа"""
         subtotal = self.subtotal or 0
         shipping = self.shipping_cost or 0
         discount = self.discount_total or 0
@@ -263,7 +262,6 @@ class OrderItem(models.Model):
 
     @property
     def total(self):
-        """Общая стоимость позиции"""
         if self.unit_price and self.quantity:
             return self.unit_price * self.quantity
         return 0
@@ -275,7 +273,7 @@ class OrderItem(models.Model):
             self.sku_display_name = self.sku.display_name
             self.attributes = self.sku.attributes
             self.unit_price = self.sku.price
-            self.image_url = self.sku.image or self.sku.product.main_image
+            self.image_url = self.sku.product.main_image
         super().save(*args, **kwargs)
 
 

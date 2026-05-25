@@ -115,6 +115,8 @@ class Track(models.Model):
 
     @property
     def duration_formatted(self):
+        if self.duration_seconds is None:
+            return "0:00"
         minutes = self.duration_seconds // 60
         seconds = self.duration_seconds % 60
         return f"{minutes}:{seconds:02d}"

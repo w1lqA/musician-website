@@ -1,25 +1,36 @@
+# orders/views.py
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 
 from . import serializers
 from .models import Order, OrderItem, Cart
 from .serializers import OrderSerializer
+from core.permissions import IsOwnerOrAdmin
 
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.select_related('user').prefetch_related('items').all()
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]  # Только авторизованные
+
+    def get_queryset(self):
+        queryset = Order.objects.select_related('user').prefetch_related('items').all()
+
+        # Не-админы видят только свои заказы
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+
+        return queryset
 
     def create(self, request, *args, **kwargs):
-
-        user = request.user
-        if not user.is_authenticated:
+        if not request.user.is_authenticated:
             return Response({"error": "Login required"}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
-            cart = Cart.objects.get(user=user)
+            cart = Cart.objects.get(user=request.user)
             if not cart.items.exists():
                 return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
         except Cart.DoesNotExist:
@@ -27,7 +38,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         with transaction.atomic():
             order = Order.objects.create(
-                user=user,
+                user=request.user,
                 status='pending',
                 shipping_cost=500.00
             )
@@ -58,6 +69,10 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
         order = self.get_object()
+
+        if order.user != request.user and not request.user.is_staff:
+            return Response({"error": "Cannot cancel another user's order"}, status=403)
+
         if order.status in ['shipped', 'delivered']:
             return Response({"error": "Cannot cancel shipped order"}, status=400)
 

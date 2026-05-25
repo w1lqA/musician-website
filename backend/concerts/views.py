@@ -1,21 +1,33 @@
-from rest_framework import viewsets, filters
+# concerts/views.py
+from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from django.utils import timezone
 from django.db.models import Count, Sum, Avg, Max, Min, Q
-from .models import Concert
-from .serializers import ConcertSerializer, TicketSerializer
+from .models import Concert, City
+from .serializers import ConcertSerializer, TicketSerializer, CitySerializer
+from core.permissions import IsAdminOrReadOnly
+
+
+class CityViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
+    permission_classes = [AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']
 
 
 class ConcertViewSet(viewsets.ModelViewSet):
-    queryset = Concert.objects.all().prefetch_related('tickets')
+    queryset = Concert.objects.all().select_related('city').prefetch_related('tickets')
     serializer_class = ConcertSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['venue', 'city', 'country']
+    search_fields = ['venue', 'city__name', 'country']
     ordering_fields = ['date', 'price', 'created_at']
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        queryset = Concert.objects.all().prefetch_related('tickets')
+        queryset = Concert.objects.all().select_related('city').prefetch_related('tickets')
 
         if self.request.query_params.get('upcoming'):
             queryset = queryset.filter(date__gt=timezone.now())
@@ -26,17 +38,23 @@ class ConcertViewSet(viewsets.ModelViewSet):
         if self.request.query_params.get('exclude_cancelled'):
             queryset = queryset.exclude(status='cancelled')
 
-        if self.request.query_params.get('city'):
-            queryset = queryset.filter(city__iexact=self.request.query_params.get('city'))
+        if self.request.query_params.get('city_id'):
+            queryset = queryset.filter(city_id=self.request.query_params.get('city_id'))
+
+        if self.request.query_params.get('city_slug'):
+            queryset = queryset.filter(city__slug=self.request.query_params.get('city_slug'))
 
         if self.request.query_params.get('user_email'):
-            queryset = queryset.filter(tickets__user__email=self.request.query_params.get('user_email'))
+            if not self.request.user.is_staff:
+                queryset = queryset.filter(tickets__user__email=self.request.user.email)
+            else:
+                queryset = queryset.filter(tickets__user__email=self.request.query_params.get('user_email'))
 
         if self.request.query_params.get('search'):
             search = self.request.query_params.get('search')
             queryset = queryset.filter(
                 Q(venue__icontains=search) |
-                Q(city__icontains=search) |
+                Q(city__name__icontains=search) |
                 Q(country__icontains=search)
             )
 
@@ -47,7 +65,7 @@ class ConcertViewSet(viewsets.ModelViewSet):
 
         return queryset
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[IsAuthenticatedOrReadOnly])
     def stats(self, request):
         stats = Concert.objects.aggregate(
             avg_price=Avg('price'),
@@ -58,53 +76,47 @@ class ConcertViewSet(viewsets.ModelViewSet):
         )
         return Response(stats)
 
-    @action(detail=True)
+    @action(detail=True, permission_classes=[IsAuthenticatedOrReadOnly])
     def tickets(self, request, pk=None):
         concert = self.get_object()
         tickets = concert.tickets.select_related('user').all()
+
+        if not request.user.is_staff:
+            tickets = tickets.filter(user=request.user)
+
         serializer = TicketSerializer(tickets, many=True)
         return Response(serializer.data)
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[IsAuthenticatedOrReadOnly])
     def upcoming(self, request):
-        concerts = Concert.objects.upcoming().prefetch_related('tickets').annotate(
+        queryset = Concert.objects.upcoming().select_related('city').prefetch_related('tickets')
+
+        city_id = request.query_params.get('city_id')
+        if city_id:
+            queryset = queryset.filter(city_id=city_id)
+
+        city_slug = request.query_params.get('city_slug')
+        if city_slug:
+            queryset = queryset.filter(city__slug=city_slug)
+
+        queryset = queryset.annotate(
             tickets_sold=Count('tickets'),
             revenue=Sum('tickets__price_paid')
         )
-        serializer = self.get_serializer(concerts, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[IsAuthenticatedOrReadOnly])
     def past(self, request):
-        concerts = Concert.objects.past().prefetch_related('tickets').annotate(
+        queryset = Concert.objects.past().select_related('city').prefetch_related('tickets')
+
+        city_id = request.query_params.get('city_id')
+        if city_id:
+            queryset = queryset.filter(city_id=city_id)
+
+        queryset = queryset.annotate(
             tickets_sold=Count('tickets'),
             revenue=Sum('tickets__price_paid')
         )
-        serializer = self.get_serializer(concerts, many=True)
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
-
-    @action(detail=False)
-    def by_city(self, request):
-        city = request.query_params.get('city')
-        if not city:
-            return Response({'error': 'city parameter required'}, status=400)
-        concerts = Concert.objects.in_city(city).prefetch_related('tickets').annotate(
-            tickets_sold=Count('tickets'),
-            revenue=Sum('tickets__price_paid')
-        )
-        serializer = self.get_serializer(concerts, many=True)
-        return Response(serializer.data)
-
-    @action(detail=False)
-    def cities(self, request):
-        cities = Concert.objects.values_list('city', flat=True).distinct()
-        return Response(list(cities))
-
-    @action(detail=False)
-    def summary(self, request):
-        has_upcoming = Concert.objects.filter(date__gt=timezone.now()).exists()
-        total = Concert.objects.count()
-        return Response({
-            'total_concerts': total,
-            'has_upcoming': has_upcoming
-        })

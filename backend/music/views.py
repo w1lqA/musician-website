@@ -1,18 +1,19 @@
-from rest_framework import viewsets
+# music/views.py
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import Release, Track
 from .serializers import ReleaseSerializer, TrackSerializer
-
+from core.permissions import IsAdminOrReadOnly
 
 class ReleaseViewSet(viewsets.ModelViewSet):
-    # prefetch_related для вложенных треков (Задание 4)
     queryset = Release.objects.all().prefetch_related('tracks')
     serializer_class = ReleaseSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
-    @action(detail=False)
+    @action(detail=False, permission_classes=[IsAuthenticatedOrReadOnly])
     def featured(self, request):
-        """Вывод рекомендованных релизов (Задание 6: exists)"""
         featured_releases = self.queryset.filter(is_featured=True)
         if not featured_releases.exists():
             return Response({"detail": "No featured releases"}, status=404)
@@ -24,3 +25,4 @@ class ReleaseViewSet(viewsets.ModelViewSet):
 class TrackViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Track.objects.select_related('release').all()
     serializer_class = TrackSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]

@@ -1,3 +1,4 @@
+# music/admin.py
 from django.contrib import admin
 from .models import Release, Track, Favorite
 
@@ -32,7 +33,7 @@ class ReleaseAdmin(admin.ModelAdmin):
             'fields': ('title', 'artist', 'type', 'release_date')
         }),
         ('Медиа', {
-            'fields': ('cover_url', 'description')
+            'fields': ('cover', 'description')  # <- было cover_url, исправил на cover
         }),
         ('Настройки отображения', {
             'fields': ('is_featured', 'created_at')
@@ -58,6 +59,7 @@ class ReleaseAdmin(admin.ModelAdmin):
             'tracks',
             'favorited_by'
         )
+
 
 @admin.register(Track)
 class TrackAdmin(admin.ModelAdmin):

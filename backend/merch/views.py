@@ -1,14 +1,16 @@
+# merch/views.py
 from rest_framework import viewsets, filters
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import Product, SKU
 from .serializers import ProductSerializer, SKUSerializer
-
+from core.permissions import IsAdminOrReadOnly
 
 class ProductViewSet(viewsets.ModelViewSet):
-    # Используем твой кастомный менеджер .active (Задание 3)
     queryset = Product.active.all().prefetch_related('skus', 'images')
     serializer_class = ProductSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'artist', 'description']
+    permission_classes = [IsAdminOrReadOnly]  # Только админы могут создавать/изменять
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -16,13 +18,12 @@ class ProductViewSet(viewsets.ModelViewSet):
         if category:
             queryset = queryset.filter(category=category)
 
-        # Пример order_by (Задание 3)
         if self.request.query_params.get('sort') == 'new':
             queryset = queryset.order_by('-created_at')
         return queryset
 
 
 class SKUViewSet(viewsets.ReadOnlyModelViewSet):
-    # select_related для оптимизации (Задание 4)
     queryset = SKU.objects.select_related('product').filter(is_active=True)
     serializer_class = SKUSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
