@@ -1,54 +1,54 @@
+// src/widgets/music-section/ui/MusicSection.tsx
 import { Container } from '@/shared/ui/Container';
 import { Button } from '@/shared/ui/Button';
-
-import albumImg1 from '@/widgets/music-section/assets/images/cassette-1.webp';
-import albumImg2 from '@/widgets/music-section/assets/images/cassette-2.webp';
-import albumImg3 from '@/widgets/music-section/assets/images/cassette-3.webp';
-import BaseSlider from '@/shared/ui/sliders/BaseSlider';
-import { MusicCard } from '@/widgets/music-section/ui/cards/MusicCard';
-
-const albums = [
-  { id: 1, image: albumImg1, title: 'Release 1', date: '12.04.2026' },
-  { id: 2, image: albumImg2, title: 'Release 2', date: '01.03.2026' },
-  { id: 3, image: albumImg3, title: 'Release 3', date: '15.02.2026' },
-];
+import { QueryStateWrapper } from '@/shared/ui/feedback/QueryStateWrapper/QueryStateWrapper';
+import { useFeaturedReleases } from '@/entities/release';
+import { MusicCard } from './cards/MusicCard';
 
 export const MusicSection = () => {
+  const { data: releases, isLoading, isError, error, refetch } = useFeaturedReleases();
+
   return (
-    <section id="music" className="bg-primary-black-600">
-      <div className="py-16 tablet:py-24">
-        <Container>
-          <div className="flex flex-col items-center gap-12 tablet:gap-16">
-            <h2 className="text-h2-display-bold text-primary-white-600 uppercase text-center">
-              НЕДАВНИЕ РЕЛИЗЫ
-            </h2>
+    <section className="bg-primary-black-600 py-16 tablet:py-24">
+      <Container>
+        <div className="space-y-12">
+          <h2 className="text-h3-display-bold text-primary-white-600 uppercase text-center">
+            ПОСЛЕДНИЕ РЕЛИЗЫ
+          </h2>
 
-            <BaseSlider
-              items={albums}
-              showNavigation
-              showPagination
-              renderItem={(album) => (
-                <MusicCard
-                  image={album.image}
-                  title={album.title}
-                  date={album.date}
-                />
-              )}
-              swiperProps={{
-                breakpoints: {
-                  320: { slidesPerView: 1, spaceBetween: 16 },
-                  768: { slidesPerView: 2, spaceBetween: 20 },
-                  1024: { slidesPerView: 3, spaceBetween: 24 },
-                },
-              }}
-            />
+          <QueryStateWrapper
+            loading={{
+              isLoading,
+              config: { message: 'Загрузка релизов...' }
+            }}
+            error={{
+              isError,
+              raw: error,
+              config: {
+                fallbackMessage: 'Не удалось загрузить релизы',
+                actionLabel: 'Повторить',
+                onClick: () => refetch()
+              }
+            }}
+            empty={{
+              isEmpty: !releases || releases.length === 0,
+              config: { message: 'Релизы не найдены' }
+            }}
+          >
+            <div className="grid grid-cols-1 tablet:grid-cols-3 gap-6">
+              {releases?.slice(0, 3).map((release) => (
+                <MusicCard key={release.id} item={release} />
+              ))}
+            </div>
+          </QueryStateWrapper>
 
-            <Button size="small" className="w-full tablet:w-[468px]">
+          {releases && releases.length > 0 && (
+            <Button variant="secondary" size="small" className="w-full mx-auto block">
               Смотреть Все
             </Button>
-          </div>
-        </Container>
-      </div>
+          )}
+        </div>
+      </Container>
     </section>
   );
 };

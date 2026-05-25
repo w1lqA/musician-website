@@ -1,8 +1,8 @@
+// src/widgets/social-section/index.tsx
 import { Container } from '@/shared/ui/Container';
 import { type HTMLAttributes } from 'react';
 import clsx from 'clsx';
 
-// Импорт иконок
 import SpotifyIcon from '@/widgets/social-section/assets/icons/SpotifyIcon';
 import TiktokIcon from '@/widgets/social-section/assets/icons/TiktokIcon';
 import YandexMusicIcon from '@/widgets/social-section/assets/icons/YandexMusicIcon';

@@ -1,15 +1,15 @@
+// src/widgets/music-section/ui/cards/MusicCard.tsx
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/shared/ui/Button';
 import { useScreenSize } from '@/shared/hooks/useScreenSize';
+import type { MusicItem } from '@/entities/release';
 
 interface MusicCardProps {
-    image: string;
-    title: string;
-    date?: string;
+    item: MusicItem;
 }
 
-export const MusicCard = ({ image, title, date = '2026' }: MusicCardProps) => {
+export const MusicCard = ({ item }: MusicCardProps) => {
     const [isHovered, setIsHovered] = useState(false);
     const { isAboveTablet } = useScreenSize();
 
@@ -32,8 +32,8 @@ export const MusicCard = ({ image, title, date = '2026' }: MusicCardProps) => {
             >
                 <div className="w-full [backface-visibility:hidden]">
                     <img
-                        src={image}
-                        alt={title}
+                        src={item.cover}
+                        alt={item.title}
                         className="w-full h-auto block rounded-md"
                     />
                 </div>
@@ -42,7 +42,7 @@ export const MusicCard = ({ image, title, date = '2026' }: MusicCardProps) => {
                     className="absolute inset-0 w-full h-full tablet:[transform:rotateY(180deg)] [backface-visibility:hidden] overflow-hidden rounded-md"
                 >
                     <img
-                        src={image}
+                        src={item.cover}
                         alt=""
                         className="absolute inset-0 w-full h-full object-cover scale-x-[-1] brightness-70 tablet:brightness-30"
                     />
@@ -50,10 +50,10 @@ export const MusicCard = ({ image, title, date = '2026' }: MusicCardProps) => {
                     <div className="relative z-10 flex flex-col items-center justify-center h-full p-4 text-center">
                         <div className="flex flex-col gap-1 mb-4">
                             <h3 className="text-lg tablet:text-xl font-bold uppercase text-white tracking-tighter leading-tight">
-                                {title}
+                                {item.title}
                             </h3>
                             <span className="text-xs tablet:text-sm text-white/50 font-medium">
-                                {date}
+                                {item.releaseDate}
                             </span>
                         </div>
 
