@@ -1,15 +1,22 @@
 # core/views.py
+from django.conf import settings
 from rest_framework import viewsets, filters, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db.models import Count, Q
+
+from concerts.models import Concert
+from merch.models import Product
+from music.models import Release
 from .models import User, Subscriber
 from .serializers import UserSerializer, SubscriberSerializer, RegisterSerializer, ChangePasswordSerializer
-from .permissions import IsOwnerOrAdmin, IsAdminOrReadOnly
+from .permissions import IsOwnerOrAdmin
+from core.utils import get_absolute_url
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -25,6 +32,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get('refresh_token')
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            return Response({'message': 'logout successful'}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({'message': 'logout successful'}, status=status.HTTP_200_OK)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -157,3 +178,89 @@ class SubscriberViewSet(viewsets.ModelViewSet):
         subscriber.unsubscribe()
         serializer = self.get_serializer(subscriber)
         return Response(serializer.data)
+
+
+class SearchViewSet(viewsets.GenericViewSet):
+    permission_classes = [AllowAny]
+
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        query = request.query_params.get('q', '').strip()
+        content_type = request.query_params.get('type', 'all')
+        sort = request.query_params.get('sort', 'relevance')
+
+        if not query:
+            return Response({
+                'results': [],
+                'count': 0,
+                'query': ''
+            })
+
+        results = []
+
+        if content_type in ['all', 'releases']:
+            releases = Release.objects.filter(
+                Q(title__icontains=query) | Q(artist__icontains=query)
+            )[:20]
+            for release in releases:
+                results.append({
+                    'type': 'release',
+                    'id': str(release.id),
+                    'title': release.title,
+                    'subtitle': release.artist,
+                    'image': get_absolute_url(release.cover.url if release.cover else ''),
+                    'url': f'/release/{release.id}',
+                    'date': release.release_date.isoformat() if release.release_date else '',
+                    'price': None,
+                    'relevance': 1 if release.title.lower().startswith(query.lower()) else 2
+                })
+
+        if content_type in ['all', 'products']:
+            products = Product.objects.filter(
+                Q(name__icontains=query) | Q(artist__icontains=query) | Q(description__icontains=query)
+            )[:20]
+            for product in products:
+                first_sku = product.skus.first()
+                results.append({
+                    'type': 'product',
+                    'id': str(product.id),
+                    'title': product.name,
+                    'subtitle': product.artist or product.category,
+                    'image': get_absolute_url(product.main_image),
+                    'url': f'/merch/{product.id}',
+                    'date': '',
+                    'price': float(first_sku.price) if first_sku and first_sku.price else None,
+                    'relevance': 1 if product.name.lower().startswith(query.lower()) else 2
+                })
+
+        if content_type in ['all', 'concerts']:
+            concerts = Concert.objects.filter(
+                Q(venue__icontains=query) | Q(city__name__icontains=query)
+            )[:20]
+            for concert in concerts:
+                results.append({
+                    'type': 'concert',
+                    'id': str(concert.id),
+                    'title': concert.venue,
+                    'subtitle': concert.city.name,
+                    'image': '',
+                    'url': f'/concert/{concert.id}',
+                    'date': concert.date.isoformat() if concert.date else '',
+                    'price': float(concert.price) if concert.price else None,
+                    'relevance': 1 if concert.venue.lower().startswith(query.lower()) else 2
+                })
+
+        if sort == 'date':
+            results.sort(key=lambda x: x.get('date', '') if x.get('date') else '9999-12-31')
+        elif sort == 'price_asc':
+            results.sort(key=lambda x: x.get('price') if x.get('price') is not None else float('inf'))
+        elif sort == 'price_desc':
+            results.sort(key=lambda x: x.get('price') if x.get('price') is not None else 0, reverse=True)
+        else:
+            results.sort(key=lambda x: (x.get('relevance', 3), x.get('date', '')))
+
+        return Response({
+            'results': results,
+            'count': len(results),
+            'query': query
+        })

@@ -1,12 +1,21 @@
 # concerts/serializers.py
 from rest_framework import serializers
 from .models import Concert, Ticket, City
+from core.utils import get_absolute_url
 
 
 class CitySerializer(serializers.ModelSerializer):
     class Meta:
         model = City
         fields = ['id', 'name', 'slug']
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+
+    class Meta:
+        model = Ticket
+        fields = ['id', 'ticket_number', 'price_paid', 'purchase_date', 'is_used_for_discount', 'user_email']
 
 
 class ConcertSerializer(serializers.ModelSerializer):
@@ -25,11 +34,3 @@ class ConcertSerializer(serializers.ModelSerializer):
 
     def get_detail_url(self, obj):
         return f"/concerts/{obj.id}/"
-
-
-class TicketSerializer(serializers.ModelSerializer):
-    user_email = serializers.EmailField(source='user.email', read_only=True)
-
-    class Meta:
-        model = Ticket
-        fields = ['id', 'ticket_number', 'price_paid', 'purchase_date', 'is_used_for_discount', 'user_email']
