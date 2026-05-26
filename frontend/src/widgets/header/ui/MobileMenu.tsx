@@ -1,7 +1,6 @@
 // src/widgets/header/ui/MobileMenu.tsx
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AuthButtons } from './AuthButtons';
 
 interface NavLink {
     to: string;

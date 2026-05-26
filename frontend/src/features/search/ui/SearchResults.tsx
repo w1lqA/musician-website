@@ -36,7 +36,7 @@ export const SearchResults = ({
     if (isError) {
         return (
             <EmptyState
-                message="Ошибка при поиске"
+                message={error instanceof Error ? error.message : 'Произошла ошибка при поиске'}
                 actionLabel="Повторить"
                 onClick={onRetry}
                 className="py-8"
