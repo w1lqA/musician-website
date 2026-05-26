@@ -27,7 +27,7 @@ export const Input = ({
             <input
                 id={id}
                 className={clsx(
-                    'w-full h-10 px-4 rounded-full bg-primary-black-500 border text-primary-white-600 text-caption-regular placeholder:text-secondary transition-all outline-none',
+                    'w-full h-10 px-4 bg-primary-black-500 border text-primary-white-600 text-caption-regular placeholder:text-secondary transition-all outline-none',
                     error ? 'border-red-500' : 'border-primary-white-500 focus:border-accent-1',
                     className
                 )}

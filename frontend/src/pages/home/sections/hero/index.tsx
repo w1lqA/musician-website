@@ -89,7 +89,7 @@ const HomeHero = ({ className }: Props) => {
                         />
 
                         <div className='absolute inset-0 w-full h-full items-center'>
-                            <div className='flex h-full w-full items-center justify-center relative overflow-hidden rounded-lg'>
+                            <div className='flex h-full w-full items-center justify-center relative overflow-hidden'>
                                 {/* Изображение с параллаксом */}
                                 <motion.div
                                     className="absolute inset-0 z-10"

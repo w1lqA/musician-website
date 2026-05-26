@@ -6,7 +6,7 @@ import { MusicSection } from '@/widgets/music-section/ui/MusicSection';
 import { SocialSection } from '@/widgets/social-section';
 import { ToursSection } from '@/widgets/tours-section/ui/ToursSection';
 
-export const HomePage = () => {
+const HomePage = () => {
   return (
     <div className="min-h-screen bg-primary-black-600 flex flex-col w-full overflow-hidden max-w-[clamp(400px,100vw,1920px)] mx-auto">
       <Header />
@@ -31,3 +31,5 @@ export const HomePage = () => {
     </div>
   );
 };
+
+export default HomePage;

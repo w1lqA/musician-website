@@ -24,7 +24,7 @@ const relatedItems: MerchItem[] = [
     { id: '4', name: 'Свитер', price: '$25.00', image: merchImg7 },
     { id: '1', name: 'Кожаная Куртка', price: '$25.00', image: merchImg1 },
 ];
-export const MerchDetailsPage = () => {
+const MerchDetailsPage = () => {
     const [selectedSize, setSelectedSize] = useState('M');
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(merchImg1);
@@ -201,3 +201,5 @@ export const MerchDetailsPage = () => {
         </div>
     );
 };
+
+export default MerchDetailsPage;

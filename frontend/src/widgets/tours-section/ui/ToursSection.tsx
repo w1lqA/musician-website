@@ -49,7 +49,7 @@ export const ToursSection = ({ className, ...props }: ToursSectionProps) => {
           </div>
 
           {stats && (
-            <div className="grid grid-cols-3 gap-4 bg-primary-black-500 p-4 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 bg-primary-black-500 p-4 border border-primary-black-300">
               <div className="text-center">
                 <p className="text-caption-regular text-primary-white-400">Всего концертов</p>
                 <p className="text-title1-bold text-primary-white-600">{stats.total_concerts}</p>

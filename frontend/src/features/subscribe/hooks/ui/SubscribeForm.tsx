@@ -36,7 +36,7 @@ export const SubscribeForm = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isPending}
-                className="w-full"
+                className="w-full rounded-full"
                 required
             />
 

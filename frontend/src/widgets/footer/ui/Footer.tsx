@@ -8,7 +8,7 @@ export const Footer = () => {
   const scrollToTop = useScrollToTop()
 
   return (
-    <footer className="bg-primary-black-500 py-8 tablet:py-10">
+    <footer className="bg-primary-black-500 py-8 mt-auto tablet:py-10">
       <Container>
         <div className="flex flex-col tablet:flex-row justify-between items-center gap-6">
           <div className="text-caption-regular text-primary-white-400">
