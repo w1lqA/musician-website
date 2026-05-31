@@ -1,5 +1,4 @@
 import HomeHero from '@/pages/home/sections/hero';
-import { Footer } from '@/widgets/footer/ui/Footer';
 import { Header } from '@/widgets/header/ui/Header';
 import { MerchSection } from '@/widgets/merch-section/ui/MerchSection';
 import { MusicSection } from '@/widgets/music-section/ui/MusicSection';
@@ -26,8 +25,6 @@ const HomePage = () => {
 
         <SocialSection />
       </main>
-
-      <Footer />
     </div>
   );
 };

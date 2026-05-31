@@ -4,7 +4,6 @@ import { Header } from '@/widgets/header/ui/Header';
 import { Container } from '@/shared/ui/Container';
 import { Button } from '@/shared/ui/Button';
 import { MerchCard } from '@/entities/merch/ui/MerchCard';
-import { Footer } from '@/widgets/footer/ui/Footer';
 
 // Import images from Figma
 import merchImg1 from '@/imports/MerchDetails/3d0dfb10b7156fea1d41e8479796f269150b6986.png';
@@ -197,7 +196,6 @@ const MerchDetailsPage = () => {
                     </Container>
                 </section>
             </main>
-            <Footer />
         </div>
     );
 };

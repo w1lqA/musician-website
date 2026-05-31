@@ -22,7 +22,7 @@ export const Button = ({
   disabled,
   type = 'button'
 }: ButtonProps) => {
-  const baseStyles = 'text-caption-medium text-center transition-all duration-300 outline-none inline-flex items-center';
+  const baseStyles = 'text-caption-medium text-center transition-all duration-300 outline-none inline-flex items-center justify-center';
 
   const variantStyles = {
     primary: 'bg-accent-1 text-primary-white-600 border border-transparent',
