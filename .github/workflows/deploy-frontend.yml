@@ -1,0 +1,67 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - frontend
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Build project
+      run: |
+        cd frontend
+        npm run build # Если тут упадет ошибка, деплой остановится автоматически!
+
+    - name: Pack dist folder
+      run: |
+        cd frontend
+        tar -czf ../deploy.tar.gz dist/
+
+    - name: Setup SSH Key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        known_hosts: 'just-a-placeholder-for-now'
+        if_key_exists: replace
+
+    - name: Upload and Deploy to VPS
+      run: |
+        # Добавляем сервер в известные хосты, чтобы не было интерактивных вопросов
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        
+        # Загружаем архив на сервер во временную папку
+        scp deploy.tar.gz ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+        
+        # Выполняем атомарное переключение на сервере
+        ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} _TIMESTAMP=$(date +%Y%m%d%H%M%S) '
+          # 1. Создаем папку под новый релиз
+          mkdir -p /var/www/w1lq.shop_releases/$_TIMESTAMP
+          
+          # 2. Распаковываем архив туда
+          tar -xzf /tmp/deploy.tar.gz -C /var/www/w1lq.shop_releases/$_TIMESTAMP --strip-components=1
+          rm /tmp/deploy.tar.gz
+          
+          # 3. Мгновенно переключаем символическую ссылку на новый релиз
+          ln -sfn /var/www/w1lq.shop_releases/$_TIMESTAMP /var/www/w1lq.shop
+          
+          # 4. Удаляем совсем старые релизы, оставляя последние 5 (чтобы диск не забивался)
+          cd /var/www/w1lq.shop_releases && ls -t | tail -n +6 | xargs rm -rf 2>/dev/null || true
+        '
