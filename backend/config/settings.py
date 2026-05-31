@@ -15,10 +15,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
-ALLOWED_HOSTS = ['*', '.railway.app', '.up.railway.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['w1lq.shop', '127.0.0.1', 'localhost']
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
+    'https://w1lq.shop',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
 ]
@@ -26,11 +27,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 # CSRF
 CSRF_TRUSTED_ORIGINS = [
+    'https://w1lq.shop',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
-    'https://*.railway.app',
 ]
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
