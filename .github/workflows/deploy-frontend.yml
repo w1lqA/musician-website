@@ -44,24 +44,22 @@ jobs:
 
     - name: Upload and Deploy to VPS
       run: |
-        # Добавляем сервер в известные хосты, чтобы не было интерактивных вопросов
+        # 1. Создаем папку для ключа и записываем его из секретов GitHub
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        
+        # 2. Добавляем сервер в известные хосты
         ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
         
-        # Загружаем архив на сервер во временную папку
-        scp deploy.tar.gz ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+        # 3. Загружаем архив, принудительно указав созданный ключ через флаг -i
+        scp -i ~/.ssh/id_ed25519 deploy.tar.gz ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
         
-        # Выполняем атомарное переключение на сервере
-        ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} _TIMESTAMP=$(date +%Y%m%d%H%M%S) '
-          # 1. Создаем папку под новый релиз
+        # 4. Выполняем атомарное переключение, также явно указав ключ -i
+        ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} _TIMESTAMP=$(date +%Y%m%d%H%M%S) '
           mkdir -p /var/www/w1lq.shop_releases/$_TIMESTAMP
-          
-          # 2. Распаковываем архив туда
           tar -xzf /tmp/deploy.tar.gz -C /var/www/w1lq.shop_releases/$_TIMESTAMP --strip-components=1
           rm /tmp/deploy.tar.gz
-          
-          # 3. Мгновенно переключаем символическую ссылку на новый релиз
           ln -sfn /var/www/w1lq.shop_releases/$_TIMESTAMP /var/www/w1lq.shop
-          
-          # 4. Удаляем совсем старые релизы, оставляя последние 5 (чтобы диск не забивался)
           cd /var/www/w1lq.shop_releases && ls -t | tail -n +6 | xargs rm -rf 2>/dev/null || true
         '
