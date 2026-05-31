@@ -5,7 +5,6 @@ import { Container } from '@/shared/ui/Container';
 import { Button } from '@/shared/ui/Button';
 import { MerchCard } from '@/entities/merch/ui/MerchCard';
 
-// Import images from Figma
 import merchImg1 from '@/imports/MerchDetails/3d0dfb10b7156fea1d41e8479796f269150b6986.png';
 import merchImg2 from '@/imports/MerchDetails/3d0dfb10b7156fea1d41e8479796f269150b6986.png';
 import merchImg3 from '@/imports/MerchDetails/3d0dfb10b7156fea1d41e8479796f269150b6986.png';
