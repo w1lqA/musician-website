@@ -52,11 +52,11 @@ jobs:
         # 2. Добавляем сервер в известные хосты
         ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
         
-        # 3. Загружаем архив, принудительно указав созданный ключ через флаг -i
-        scp -i ~/.ssh/id_ed25519 deploy.tar.gz ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
+        # 3. Загружаем архив, запрещая перебор других ключей системы
+        scp -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519 deploy.tar.gz ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:/tmp/deploy.tar.gz
         
-        # 4. Выполняем атомарное переключение, также явно указав ключ -i
-        ssh -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} _TIMESTAMP=$(date +%Y%m%d%H%M%S) '
+        # 4. Выполняем атомарное переключение на сервере, также запрещая перебор ключей
+        ssh -o IdentitiesOnly=yes -i ~/.ssh/id_ed25519 ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} _TIMESTAMP=$(date +%Y%m%d%H%M%S) '
           mkdir -p /var/www/w1lq.shop_releases/$_TIMESTAMP
           tar -xzf /tmp/deploy.tar.gz -C /var/www/w1lq.shop_releases/$_TIMESTAMP --strip-components=1
           rm /tmp/deploy.tar.gz
