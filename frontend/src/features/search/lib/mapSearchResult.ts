@@ -1,5 +1,6 @@
 // src/features/search/lib/mapSearchResult.ts
 import type { SearchResultDTO } from '@/shared/api/search/types';
+import { getMediaUrl } from '@/shared/lib/media';
 
 export interface SearchResultUI {
     id: string;
@@ -17,7 +18,7 @@ export const mapSearchResultToUI = (dto: SearchResultDTO): SearchResultUI => ({
     type: dto.type,
     title: dto.title,
     subtitle: dto.subtitle,
-    image: dto.image,
+    image: getMediaUrl(dto.image),
     url: dto.url,
     price: dto.price,
     date: dto.date,

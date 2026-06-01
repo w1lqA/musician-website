@@ -3,7 +3,7 @@ import { Container } from '@/shared/ui/Container';
 import { useLogout, useMe } from '@/features/auth/hooks/useAuth';
 import { Button } from '@/shared/ui/Button';
 import { Mail, Calendar, User as UserIcon, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { EmptyState } from '@/shared/ui/feedback/EmptyState/EmptyState';
 import { useAuthStore } from '@/features/auth/model/store';
 import { Loader } from '@/shared/ui/feedback/Loader/Loader';
@@ -104,14 +104,14 @@ export default function ProfilePage() {
 
                         {user.isStaff && (
                             <div className="pt-4 border-t border-primary-black-300">
-                                <a
-                                    href="http://localhost:8000/admin/"
+                                <Link
+                                    to="/admin"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-block text-caption-regular text-accent-1 hover:underline"
                                 >
                                     Админ-панель →
-                                </a>
+                                </Link>
                             </div>
                         )}
 

@@ -12,10 +12,11 @@ const MerchDetailsPage = lazy(() => import('@/pages/merch-details'));
 const LoginPage = lazy(() => import('@/pages/auth/login'));
 const RegisterPage = lazy(() => import('@/pages/auth/register'));
 
-// админские страницы (пока закомментированы)
-// const AdminReleasesPage = lazy(() => import('@/pages/admin/releases'));
-// const AdminReleaseCreatePage = lazy(() => import('@/pages/admin/releases/create'));
-// const AdminReleaseEditPage = lazy(() => import('@/pages/admin/releases/[id]/edit'));
+// админские страницы
+const AdminPage = lazy(() => import('@/pages/admin'));
+const AdminReleasesPage = lazy(() => import('@/pages/admin/releases'));
+const AdminReleaseCreatePage = lazy(() => import('@/pages/admin/releases/create'));
+const AdminReleaseEditPage = lazy(() => import('@/pages/admin/releases/edit'));
 
 const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType>) => (
     <Suspense fallback={<Loader className='my-auto' message="Загрузка..." />}>
@@ -44,17 +45,17 @@ export const router = createBrowserRouter([
                 ],
             },
 
-            // админка (только для staff) - пока закомментировано
-            // {
-            //     element: <ProtectedRoute adminOnly redirectTo="/auth/login" />,
-            //     children: [
-            //         { path: 'admin/releases', element: withSuspense(AdminReleasesPage) },
-            //         { path: 'admin/releases/new', element: withSuspense(AdminReleaseCreatePage) },
-            //         { path: 'admin/releases/:id/edit', element: withSuspense(AdminReleaseEditPage) },
-            //     ],
-            // },
+            // админка (только для staff)
+            {
+                element: <ProtectedRoute adminOnly redirectTo="/auth/login" />,
+                children: [
+                    { path: 'admin', element: withSuspense(AdminPage) },
+                    { path: 'admin/releases', element: withSuspense(AdminReleasesPage) },
+                    { path: 'admin/releases/create', element: withSuspense(AdminReleaseCreatePage) },
+                    { path: 'admin/releases/edit', element: withSuspense(AdminReleaseEditPage) },
+                ],
+            },
 
-            // редирект на 404 потом
             { path: '*', element: <Navigate to="/" replace /> },
         ],
     },
