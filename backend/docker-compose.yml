@@ -20,8 +20,8 @@ services:
     restart: always
     command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
     volumes:
-      - ./media:/app/media
-      - ./staticfiles:/app/staticfiles
+      - /var/www/w1lq.shop_shared/media:/app/media
+      - /var/www/w1lq.shop_shared/staticfiles:/app/staticfiles
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DEBUG=${DEBUG:-False}
