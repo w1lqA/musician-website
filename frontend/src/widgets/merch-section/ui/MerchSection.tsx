@@ -14,12 +14,12 @@ export const MerchSection = ({ className, ...props }: MerchSectionProps) => {
   return (
     <section
       id="merch"
-      className={clsx('bg-primary-black-600 py-16 tablet:py-24 flex w-full', className)}
+      className={clsx('bg-primary-black-600 py-16 tablet:py-24 flex w-full print:py-4', className)}
       {...props}
     >
       <Container>
-        <div className="space-y-12 tablet:space-y-12">
-          <h2 className="text-h3-display-bold text-primary-white-600 uppercase text-center tablet:text-left">
+        <div className="space-y-12 tablet:space-y-12 print:space-y-4">
+          <h2 className="text-h3-display-bold text-primary-white-600 uppercase text-center tablet:text-left print:text-black print:text-h4-display-bold">
             ЭКСКЛЮЗИВНЫЙ МЕРЧ
           </h2>
 
@@ -42,7 +42,7 @@ export const MerchSection = ({ className, ...props }: MerchSectionProps) => {
               config: { message: 'Товары не найдены' }
             }}
           >
-            <div className="grid grid-cols-2 tablet:grid-cols-4 desktop:grid-cols-2 gap-5 tablet:gap-5">
+            <div className="grid grid-cols-2 tablet:grid-cols-4 desktop:grid-cols-2 gap-5 tablet:gap-5 print:grid-cols-2 print:gap-2">
               {products?.slice(0, 4).map((item) => (
                 <MerchCard key={item.id} item={item} />
               ))}
@@ -50,7 +50,7 @@ export const MerchSection = ({ className, ...props }: MerchSectionProps) => {
           </QueryStateWrapper>
 
           {products && products.length > 0 && (
-            <Button variant="secondary" size="small" className="w-full mx-auto block">
+            <Button variant="secondary" size="small" className="w-full mx-auto block print:hidden">
               Смотреть Все
             </Button>
           )}

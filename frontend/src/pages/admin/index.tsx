@@ -1,45 +1,45 @@
-// src/pages/admin/index.tsx
+// src/pages/dashboard/index.tsx
 import { Container } from '@/shared/ui/Container';
 import { useAuthStore } from '@/features/auth/model/store';
 import { Navigate, Link } from 'react-router-dom';
-import { Album, Package, Calendar, Users, Tag, Shield } from 'lucide-react';
+import { Package, Calendar, Users, Tag, Shield, Music2Icon } from 'lucide-react';
 
 const adminModules = [
     {
         title: 'Релизы',
         description: 'Управление музыкальными релизами и треками',
-        icon: Album,
-        path: '/admin/releases',
+        icon: Music2Icon,
+        path: '/dashboard/releases',
     },
     {
         title: 'Товары',
         description: 'Управление мерчем и товарами',
         icon: Package,
-        path: '/admin/products',
+        path: '/dashboard/products',
     },
     {
         title: 'Концерты',
         description: 'Управление концертами и билетами',
         icon: Calendar,
-        path: '/admin/concerts',
+        path: '/dashboard/concerts',
     },
     {
         title: 'Пользователи',
         description: 'Управление пользователями',
         icon: Users,
-        path: '/admin/users',
+        path: '/dashboard/users',
     },
     {
         title: 'Промокоды',
         description: 'Управление промокодами',
         icon: Tag,
-        path: '/admin/discounts',
+        path: '/dashboard/discounts',
     },
     {
         title: 'Права доступа',
         description: 'Управление ролями и правами',
         icon: Shield,
-        path: '/admin/permissions',
+        path: '/dashboard/permissions',
     },
 ];
 

@@ -9,10 +9,10 @@ export const MusicSection = () => {
   const { data: releases, isLoading, isError, error, refetch } = useFeaturedReleases();
 
   return (
-    <section className="bg-primary-black-600 py-16 tablet:py-24">
+    <section className="bg-primary-black-600 py-16 tablet:py-24 print:py-4">
       <Container>
-        <div className="space-y-12">
-          <h2 className="text-h3-display-bold text-primary-white-600 uppercase text-center">
+        <div className="flex flex-col gap-12 w-full print:gap-4">
+          <h2 className="text-h3-display-bold text-primary-white-600 uppercase text-center print:text-black print:text-h4-display-bold">
             ПОСЛЕДНИЕ РЕЛИЗЫ
           </h2>
 
@@ -35,7 +35,7 @@ export const MusicSection = () => {
               config: { message: 'Релизы не найдены' }
             }}
           >
-            <div className="grid grid-cols-1 tablet:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 tablet:grid-cols-3 gap-6 print:grid-cols-1 print:gap-2">
               {releases?.slice(0, 3).map((release) => (
                 <MusicCard key={release.id} item={release} />
               ))}
@@ -43,7 +43,7 @@ export const MusicSection = () => {
           </QueryStateWrapper>
 
           {releases && releases.length > 0 && (
-            <Button variant="secondary" size="small" className="w-full mx-auto block">
+            <Button variant="secondary" size="small" className="w-full mx-auto block tablet:max-w-1/3 print:hidden">
               Смотреть Все
             </Button>
           )}

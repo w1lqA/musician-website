@@ -105,7 +105,7 @@ export default function ProfilePage() {
                         {user.isStaff && (
                             <div className="pt-4 border-t border-primary-black-300">
                                 <Link
-                                    to="/admin"
+                                    to="/dashboard"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-block text-caption-regular text-accent-1 hover:underline"

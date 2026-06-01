@@ -34,6 +34,7 @@ export const router = createBrowserRouter([
             { path: 'merch/:id', element: withSuspense(MerchDetailsPage) },
 
             // auth
+            { path: 'auth', element: <Navigate to="/auth/login" replace /> },
             { path: 'auth/login', element: withSuspense(LoginPage) },
             { path: 'auth/register', element: withSuspense(RegisterPage) },
 
@@ -49,10 +50,10 @@ export const router = createBrowserRouter([
             {
                 element: <ProtectedRoute adminOnly redirectTo="/auth/login" />,
                 children: [
-                    { path: 'admin', element: withSuspense(AdminPage) },
-                    { path: 'admin/releases', element: withSuspense(AdminReleasesPage) },
-                    { path: 'admin/releases/create', element: withSuspense(AdminReleaseCreatePage) },
-                    { path: 'admin/releases/edit', element: withSuspense(AdminReleaseEditPage) },
+                    { path: 'dashboard', element: withSuspense(AdminPage) },
+                    { path: 'dashboard/releases', element: withSuspense(AdminReleasesPage) },
+                    { path: 'dashboard/releases/create', element: withSuspense(AdminReleaseCreatePage) },
+                    { path: 'dashboard/releases/edit', element: withSuspense(AdminReleaseEditPage) },
                 ],
             },
 

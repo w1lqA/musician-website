@@ -45,7 +45,7 @@ export default function AdminReleasesPage() {
                             Управление музыкальными релизами
                         </p>
                     </div>
-                    <Link to="/admin/releases/create">
+                    <Link to="/dashboard/releases/create">
                         <Button size="small" className="flex items-center gap-2">
                             <Plus className="w-4 h-4" />
                             Создать релиз
@@ -72,7 +72,7 @@ export default function AdminReleasesPage() {
                         config: {
                             message: 'Релизы не найдены',
                             actionLabel: 'Создать первый релиз',
-                            actionTo: '/admin/releases/create',
+                            actionTo: '/dashboard/releases/create',
                         },
                     }}
                 >
@@ -134,7 +134,7 @@ export default function AdminReleasesPage() {
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
                                                     <Link
-                                                        to={`/admin/releases/edit?id=${release.id}`}
+                                                        to={`/dashboard/releases/edit?id=${release.id}`}
                                                         className="p-1 text-primary-white-400 hover:text-accent-1 transition-colors"
                                                     >
                                                         <Edit className="w-5 h-5" />

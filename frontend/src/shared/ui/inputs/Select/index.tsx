@@ -17,6 +17,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select = ({ options, label, error, className, ...props }: SelectProps) => {
     const id = useId();
+    const describedBy = error ? `${id}-error` : undefined;
 
     return (
         <div className={clsx('flex flex-col gap-1.5', className)}>
@@ -29,6 +30,9 @@ export const Select = ({ options, label, error, className, ...props }: SelectPro
             <div className="relative w-full group">
                 <select
                     id={id}
+                    aria-label={label || 'Выберите опцию'}
+                    aria-invalid={!!error}
+                    aria-describedby={describedBy}
                     className={clsx(
                         'w-full bg-primary-black-500 border h-9 pl-4 pr-10',
                         'text-primary-white-600 text-caption-regular cursor-pointer',
@@ -45,12 +49,14 @@ export const Select = ({ options, label, error, className, ...props }: SelectPro
                     ))}
                 </select>
 
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform group-focus-within:rotate-180">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none transition-transform group-focus-within:rotate-180" aria-hidden="true">
                     <ArrowIcon className="w-4 h-4 text-primary-white-600 rotate-90" />
                 </div>
             </div>
             {error && (
-                <p className="text-caption-regular text-accent-1 ml-1">{error}</p>
+                <p id={`${id}-error`} className="text-caption-regular text-accent-1 ml-1">
+                    {error}
+                </p>
             )}
         </div>
     );

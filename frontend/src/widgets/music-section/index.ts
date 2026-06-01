@@ -1,0 +1,1 @@
+export { MusicSection } from '@/widgets/music-section/ui/MusicSection';

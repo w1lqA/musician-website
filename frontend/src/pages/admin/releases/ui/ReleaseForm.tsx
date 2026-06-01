@@ -5,7 +5,9 @@ import { z } from 'zod';
 import { Input } from '@/shared/ui/inputs/Input';
 import { Button } from '@/shared/ui/Button';
 import { Select } from '@/shared/ui/inputs/Select';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { getAudioDuration } from '@/pages/admin/releases/lib';
 
 const trackSchema = z.object({
     id: z.string().optional(),
@@ -44,7 +46,7 @@ interface ReleaseFormProps {
 }
 
 export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }: ReleaseFormProps) => {
-    const { register, control, handleSubmit, formState: { errors } } = useForm<ReleaseFormValues>({
+    const { register, control, handleSubmit, setValue, formState: { errors } } = useForm<ReleaseFormValues>({
         resolver: zodResolver(releaseSchema),
         defaultValues: {
             title: '',
@@ -64,13 +66,30 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
         name: 'tracks',
     });
 
+    const [processingTracks, setProcessingTracks] = useState<Record<number, boolean>>({});
+
     const addTrack = () => {
         const nextNumber = fields.length + 1;
         append({
             track_number: nextNumber,
             title: '',
-            duration_seconds: 180,
+            duration_seconds: 0,
         });
+    };
+
+    const handleFileChange = async (index: number, file: File | undefined) => {
+        if (!file) return;
+
+        setProcessingTracks(prev => ({ ...prev, [index]: true }));
+
+        try {
+            const duration = await getAudioDuration(file);
+            setValue(`tracks.${index}.duration_seconds`, duration);
+        } catch (error) {
+            console.error('Ошибка получения длительности:', error);
+        } finally {
+            setProcessingTracks(prev => ({ ...prev, [index]: false }));
+        }
     };
 
     return (
@@ -93,6 +112,7 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                     options={typeOptions}
                     error={errors.type?.message}
                     {...register('type')}
+                    className='[&_select]:border-primary-white-600!'
                 />
                 <Input
                     label="Дата релиза"
@@ -115,7 +135,7 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                     <input
                         type="file"
                         accept="image/*"
-                        className="w-full bg-primary-black-500 border border-primary-black-300 h-10 px-4 text-primary-white-600 file:bg-accent-1 file:text-primary-white-600 file:border-0 file:h-full file:px-4 file:mr-4"
+                        className="w-full bg-primary-black-500 border border-primary-black-300 h-10 text-primary-white-600 file:bg-accent-1 file:text-primary-white-600 file:border-0 file:h-full file:px-4 file:mr-4"
                         {...register('cover')}
                     />
                 </div>
@@ -161,21 +181,27 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                                         error={errors.tracks?.[index]?.title?.message}
                                     />
                                 </div>
-                                <div className="tablet:col-span-2">
-                                    <Input
-                                        type="number"
-                                        placeholder="Длительность (сек)"
-                                        {...register(`tracks.${index}.duration_seconds` as const, { valueAsNumber: true })}
-                                        error={errors.tracks?.[index]?.duration_seconds?.message}
-                                    />
-                                </div>
-                                <div className="tablet:col-span-3">
-                                    <input
-                                        type="file"
-                                        accept="audio/*"
-                                        className="w-full bg-primary-black-500 border border-primary-black-300 h-10 px-2 text-primary-white-600 text-caption-regular"
-                                        {...register(`tracks.${index}.file` as const)}
-                                    />
+                                <div className="tablet:col-span-5">
+                                    <div className="relative">
+                                        <input
+                                            type="file"
+                                            accept="audio/*"
+                                            className="w-full bg-primary-black-500 border border-primary-black-300 h-10 text-primary-white-600 file:bg-accent-1 file:text-primary-white-600 file:border-0 file:h-full file:px-4 file:mr-4"
+                                            {...register(`tracks.${index}.file` as const)}
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    handleFileChange(index, file);
+                                                }
+                                                register(`tracks.${index}.file`).onChange(e);
+                                            }}
+                                        />
+                                        {processingTracks[index] && (
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                <Loader2 className="w-4 h-4 text-accent-1 animate-spin" />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="tablet:col-span-1 flex items-center justify-end">
                                     <button
@@ -187,6 +213,12 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                                     </button>
                                 </div>
                             </div>
+
+                            {/* скрытое поле для duration_seconds */}
+                            <input
+                                type="hidden"
+                                {...register(`tracks.${index}.duration_seconds` as const, { valueAsNumber: true })}
+                            />
                         </div>
                     ))}
                 </div>

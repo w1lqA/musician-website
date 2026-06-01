@@ -38,6 +38,7 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, onLinkClick }: MobileMen
                         transition={{ duration: 0.3 }}
                         className="fixed inset-0 bg-black/80 backdrop-blur-sm tablet:hidden z-40"
                         onClick={onClose}
+                        aria-hidden="true"
                     />
 
                     <motion.div
@@ -46,9 +47,16 @@ export const MobileMenu = ({ isOpen, onClose, navLinks, onLinkClick }: MobileMen
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                         className="fixed top-0 right-0 h-full w-64 bg-primary-black-500 shadow-xl z-40 tablet:hidden"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Мобильное меню"
                     >
                         <div className="flex flex-col h-full">
-                            <nav className="flex flex-col items-end justify-center flex-1 px-8 space-y-8">
+                            <nav
+                                className="flex flex-col items-end justify-center flex-1 px-8 space-y-8"
+                                role="navigation"
+                                aria-label="Мобильная навигация"
+                            >
                                 {navLinks.map((link) => (
                                     link.hash ? (
                                         <a

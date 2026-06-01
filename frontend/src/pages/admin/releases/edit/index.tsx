@@ -1,6 +1,6 @@
 import { Container } from '@/shared/ui/Container';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ReleaseForm, type ReleaseFormValues } from '../components/ReleaseForm';
+import { ReleaseForm, type ReleaseFormValues } from '../ui/ReleaseForm';
 import { useUpdateRelease } from '@/features/admin/hooks/useAdminReleases';
 import { useReleaseRawById } from '@/entities/release/hooks/useReleaseQueries';
 import { QueryStateWrapper } from '@/shared/ui/feedback/QueryStateWrapper/QueryStateWrapper';
@@ -19,7 +19,7 @@ export default function AdminReleaseEditPage() {
         if (!id) return;
         updateRelease({ id, data }, {
             onSuccess: () => {
-                navigate('/admin/releases');
+                navigate('/dashboard/releases');
             },
         });
     };
@@ -48,7 +48,7 @@ export default function AdminReleaseEditPage() {
             <Container className="py-20">
                 <div className="text-center">
                     <p className="text-primary-white-400">ID релиза не указан</p>
-                    <Link to="/admin/releases" className="text-accent-1 hover:underline mt-4 inline-block">
+                    <Link to="/dashboard/releases" className="text-accent-1 hover:underline mt-4 inline-block">
                         Вернуться к списку
                     </Link>
                 </div>
@@ -61,7 +61,7 @@ export default function AdminReleaseEditPage() {
             <div className="max-w-4xl mx-auto">
                 <div className="mb-8">
                     <Link
-                        to="/admin/releases"
+                        to="/dashboard/releases"
                         className="inline-flex items-center gap-1 text-caption-regular text-primary-white-400 hover:text-accent-1 transition-colors mb-4"
                     >
                         <ChevronLeft className="w-4 h-4" />
