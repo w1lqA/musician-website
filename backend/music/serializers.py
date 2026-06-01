@@ -13,7 +13,12 @@ class TrackSerializer(serializers.ModelSerializer):
         fields = ['id', 'track_number', 'title', 'duration', 'file']
 
     def get_file(self, obj):
-        return get_absolute_url(obj.file.url if obj.file else '')
+        try:
+            if obj.file and hasattr(obj.file, 'url'):
+                return get_absolute_url(obj.file.url)
+            return ''
+        except (ValueError, OSError, AttributeError):
+            return ''
 
 
 class ReleaseSerializer(serializers.ModelSerializer):
@@ -29,4 +34,9 @@ class ReleaseSerializer(serializers.ModelSerializer):
         ]
 
     def get_cover(self, obj):
-        return get_absolute_url(obj.cover.url if obj.cover else '')
+        try:
+            if obj.cover and hasattr(obj.cover, 'url'):
+                return get_absolute_url(obj.cover.url)
+            return ''
+        except (ValueError, OSError, AttributeError):
+            return ''

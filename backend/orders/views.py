@@ -8,7 +8,6 @@ from django.db import transaction
 from . import serializers
 from .models import Order, OrderItem, Cart
 from .serializers import OrderSerializer
-from core.permissions import IsOwnerOrAdmin
 
 
 class OrderViewSet(viewsets.ModelViewSet):

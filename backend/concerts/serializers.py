@@ -1,7 +1,6 @@
 # concerts/serializers.py
 from rest_framework import serializers
 from .models import Concert, Ticket, City
-from core.utils import get_absolute_url
 
 
 class CitySerializer(serializers.ModelSerializer):
