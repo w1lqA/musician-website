@@ -37,7 +37,11 @@ export const MusicSection = () => {
           >
             <div className="grid grid-cols-1 tablet:grid-cols-3 gap-6 print:grid-cols-1 print:gap-2">
               {releases?.slice(0, 3).map((release) => (
-                <MusicCard key={release.id} item={release} />
+                <MusicCard
+                  key={release.id}
+                  item={release}
+                  tracks={release.tracks}
+                />
               ))}
             </div>
           </QueryStateWrapper>

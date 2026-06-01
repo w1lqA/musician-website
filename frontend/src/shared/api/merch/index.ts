@@ -1,18 +1,16 @@
 // src/shared/api/merch/index.ts
 import { baseApi } from '@/shared/api/base';
-import type { ProductDTO, CreateProductDTO, UpdateProductDTO } from './types';
+import type { ProductDTO, ProductsResponseDTO, CreateProductDTO, UpdateProductDTO } from './types';
 
 export const merchApi = {
-    getProducts: async (params?: { 
-        category?: string; 
-        search?: string; 
+    getProducts: async (params?: {
+        category?: string;
+        search?: string;
         sort?: 'new';
         limit?: number;
-    }): Promise<ProductDTO[]> => {
+        page?: number;
+    }): Promise<ProductsResponseDTO> => {
         const response = await baseApi.get('/products/', { params });
-        if (response.data && Array.isArray(response.data.results)) {
-            return response.data.results;
-        }
         return response.data;
     },
 

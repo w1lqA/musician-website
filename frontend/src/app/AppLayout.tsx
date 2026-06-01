@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Header } from '@/widgets/header/ui/Header';
 import { Footer } from '@/widgets/footer/ui/Footer';
 import GrainOverlay from '@/shared/ui/GrainOverlay';
+import { MusicPlayer } from '@/widgets/music-player/ui/MusicPlayer';
 
 export const AppLayout = () => {
     return (
@@ -13,6 +14,7 @@ export const AppLayout = () => {
                 <Outlet />
             </main>
             <Footer />
+            <MusicPlayer />
         </div>
     );
 };

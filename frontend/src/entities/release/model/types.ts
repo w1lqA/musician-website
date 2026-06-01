@@ -22,6 +22,14 @@ export interface Release {
     created_at?: string;
 }
 
+export interface MusicTrack {
+    id: string;
+    trackNumber: number;
+    title: string;
+    duration: string;
+    file: string;
+}
+
 export interface MusicItem {
     id: string;
     title: string;
@@ -30,6 +38,7 @@ export interface MusicItem {
     releaseDate: string;
     type: string;
     isFeatured?: boolean;
+    tracks?: MusicTrack[];
 }
 
 export interface TrackFormData {

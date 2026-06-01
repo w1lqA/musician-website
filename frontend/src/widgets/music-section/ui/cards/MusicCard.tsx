@@ -4,16 +4,32 @@ import { motion } from 'framer-motion';
 import { Button } from '@/shared/ui/Button';
 import { useScreenSize } from '@/shared/hooks/useScreenSize';
 import type { MusicItem } from '@/entities/release';
+import { usePlayerStore } from '@/widgets/music-player/model/playerStore';
 
 interface MusicCardProps {
     item: MusicItem;
+    tracks?: Array<{ id: string; file: string; title: string }>;
 }
 
-export const MusicCard = ({ item }: MusicCardProps) => {
+export const MusicCard = ({ item, tracks = [] }: MusicCardProps) => {
     const [isHovered, setIsHovered] = useState(false);
     const { isAboveTablet } = useScreenSize();
+    const { openPlayer } = usePlayerStore();
 
     const rotationY = isAboveTablet && isHovered ? 180 : 0;
+
+    const handleListen = () => {
+        const firstTrack = tracks[0];
+        if (firstTrack) {
+            openPlayer({
+                id: firstTrack.id,
+                src: firstTrack.file,
+                title: item.title,
+                artist: item.artist,
+                cover: item.cover,
+            });
+        }
+    };
 
     return (
         <div
@@ -55,7 +71,14 @@ export const MusicCard = ({ item }: MusicCardProps) => {
                             </span>
                         </div>
 
-                        <Button variant='secondary' hoverVariant='secondaryDefault' size="medium" className="px-6 py-2 tracking-widest uppercase print:hidden">
+                        <Button
+                            variant='secondary'
+                            hoverVariant='secondaryDefault'
+                            size="medium"
+                            className="px-6 py-2 tracking-widest uppercase print:hidden"
+                            onClick={handleListen}
+                            aria-label={`Слушать ${item.title}`}
+                        >
                             СЛУШАТЬ
                         </Button>
                     </div>

@@ -1,4 +1,11 @@
 // src/shared/api/merch/types.ts
+export interface ProductsResponseDTO {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: ProductDTO[];
+}
+
 export interface ProductImageDTO {
     id: string;
     image: string;
@@ -31,13 +38,6 @@ export interface ProductDTO {
     is_active: boolean;
 }
 
-export interface ProductsResponseDTO {
-    count: number;
-    next: string | null;
-    previous: string | null;
-    results: ProductDTO[];
-}
-
 export interface CreateProductDTO {
     name: string;
     description: string;
@@ -47,4 +47,4 @@ export interface CreateProductDTO {
     is_active?: boolean;
 }
 
-export interface UpdateProductDTO extends Partial<CreateProductDTO> {}
+export interface UpdateProductDTO extends Partial<CreateProductDTO> { }
