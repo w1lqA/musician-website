@@ -12,6 +12,7 @@ export const MusicPlayer = () => {
 
     const audioSrc = getMediaUrl(currentTrack.src);
 
+
     return (
         <AnimatePresence>
             {isOpen && (
