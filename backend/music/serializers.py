@@ -30,7 +30,7 @@ class ReleaseSerializer(serializers.ModelSerializer):
         model = Release
         fields = [
             'id', 'title', 'artist', 'type', 'type_display',
-            'release_date', 'cover', 'tracks', 'is_featured'
+            'release_date', 'cover', 'tracks', 'is_featured', 'description'
         ]
 
     def get_cover(self, obj):
