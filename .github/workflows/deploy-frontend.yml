@@ -49,11 +49,18 @@ jobs:
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
+        key: ${{ secrets.SERVER_SSK_KEY }}
+        port: 22
         script: |
           _TIMESTAMP=$(date +%Y%m%d%H%M%S)
           mkdir -p /var/www/w1lq.shop_releases/$_TIMESTAMP
           tar -xzf /tmp/deploy.tar.gz -C /var/www/w1lq.shop_releases/$_TIMESTAMP --strip-components=1
-          rm /tmp/deploy.tar.gz
+          rm -f /tmp/deploy.tar.gz
           ln -sfn /var/www/w1lq.shop_releases/$_TIMESTAMP /var/www/w1lq.shop
+          
+          # ОЧЕНЬ ВАЖНО: перезагрузить nginx, чтобы он подхватил новый симлинк
+          sudo systemctl reload nginx
+          # Или если nginx от root: /usr/sbin/nginx -s reload
+          
+          # Очистка старых релизов (оставить 5 последних)
           cd /var/www/w1lq.shop_releases && ls -t | tail -n +6 | xargs rm -rf 2>/dev/null || true
