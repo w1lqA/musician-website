@@ -1,16 +1,25 @@
 # merch/views.py
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.pagination import PageNumberPagination
 from .models import Product, SKU
 from .serializers import ProductSerializer, SKUSerializer
 from core.permissions import IsAdminOrReadOnly
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'limit'
+    max_page_size = 100
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.active.all().prefetch_related('skus', 'images')
     serializer_class = ProductSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', 'artist', 'description']
-    permission_classes = [IsAdminOrReadOnly]  # Только админы могут создавать/изменять
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = StandardResultsSetPagination  # добавляем пагинацию
 
     def get_queryset(self):
         queryset = super().get_queryset()
