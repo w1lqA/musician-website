@@ -8,7 +8,7 @@ from django.db import transaction
 
 from merch.models import Product, SKU
 from music.models import Release, Track, Favorite
-from concerts.models import Concert, Ticket
+from concerts.models import Concert, Ticket, City
 from discounts.models import DiscountCode
 from orders.models import Cart, CartItem, Order, OrderItem, OrderDiscount
 from core.models import Subscriber
@@ -30,7 +30,8 @@ class Command(BaseCommand):
             releases = self.create_releases()
             tracks = self.create_tracks(releases)
             favorites = self.create_favorites(users, releases)
-            concerts = self.create_concerts()
+            cities = self.create_cities()
+            concerts = self.create_concerts(cities)
             tickets = self.create_tickets(concerts, users)
             discount_codes = self.create_discount_codes(tickets)
             products = self.create_products()
@@ -54,6 +55,7 @@ class Command(BaseCommand):
         DiscountCode.objects.all().delete()
         Ticket.objects.all().delete()
         Concert.objects.all().delete()
+        City.objects.all().delete()
         Favorite.objects.all().delete()
         Track.objects.all().delete()
         Release.objects.all().delete()
@@ -230,50 +232,94 @@ class Command(BaseCommand):
         self.stdout.write(f'создано {len(favorites)} избранных')
         return favorites
 
-    def create_concerts(self, count=4):
+    def create_cities(self):
+        self.stdout.write('создаем города...')
+
+        cities_data = [
+            ('Москва', 'moscow'),
+            ('Санкт-Петербург', 'spb'),
+            ('Екатеринбург', 'ekaterinburg'),
+            ('Новосибирск', 'novosibirsk'),
+            ('Казань', 'kazan')
+        ]
+
+        cities = []
+        for name, slug in cities_data:
+            city, created = City.objects.get_or_create(
+                slug=slug,
+                defaults={'name': name}
+            )
+            cities.append(city)
+            self.stdout.write(f'  {name} -> {city.id}')
+
+        return cities
+
+    def create_concerts(self, cities):
         self.stdout.write('создаем концерты...')
-        concerts = []
+
+        city_map = {city.name: city for city in cities}
 
         concert_data = [
             {
                 'venue': 'ГлавClub',
-                'city': 'Москва',
+                'city': city_map['Москва'],
                 'status': 'upcoming',
                 'total_tickets': 300
             },
             {
                 'venue': 'А2',
-                'city': 'Санкт-Петербург',
+                'city': city_map['Санкт-Петербург'],
                 'status': 'soldout',
                 'total_tickets': 500
             },
             {
                 'venue': '16 тонн',
-                'city': 'Москва',
+                'city': city_map['Москва'],
                 'status': 'upcoming',
                 'total_tickets': 200
             },
             {
                 'venue': 'Космонавт',
-                'city': 'Санкт-Петербург',
+                'city': city_map['Санкт-Петербург'],
                 'status': 'completed',
                 'total_tickets': 400
+            },
+            {
+                'venue': 'Tele-Club',
+                'city': city_map['Екатеринбург'],
+                'status': 'upcoming',
+                'total_tickets': 350
+            },
+            {
+                'venue': 'Олимпик',
+                'city': city_map['Новосибирск'],
+                'status': 'upcoming',
+                'total_tickets': 280
+            },
+            {
+                'venue': 'Pyramid',
+                'city': city_map['Казань'],
+                'status': 'upcoming',
+                'total_tickets': 320
             }
         ]
 
-        for i, data in enumerate(concert_data[:count]):
+        concerts = []
+        for i, data in enumerate(concert_data):
+            sold = random.randint(50, data['total_tickets'] - 50)
             concert = Concert.objects.create(
                 venue=data['venue'],
                 city=data['city'],
                 country='Россия',
                 date=timezone.now() + timedelta(days=random.randint(10, 90)),
-                price=random.randint(1000, 3000),
+                price=random.randint(1000, 3500),
                 ticket_url=f"https://tickets.example.com/concert_{i+1}",
                 status=data['status'],
                 total_tickets=data['total_tickets'],
-                sold_tickets=random.randint(50, data['total_tickets'])
+                sold_tickets=sold
             )
             concerts.append(concert)
+            self.stdout.write(f'  {concert.venue} ({concert.city.name}) - {concert.price}₽')
 
         self.stdout.write(f'создано {len(concerts)} концертов')
         return concerts
@@ -282,7 +328,7 @@ class Command(BaseCommand):
         self.stdout.write('создаем билеты...')
         tickets = []
 
-        for concert in concerts[:2]:
+        for concert in concerts[:4]:
             for user in users[:3]:
                 ticket = Ticket.objects.create(
                     concert=concert,
@@ -304,7 +350,7 @@ class Command(BaseCommand):
             if random.choice([True, False]):
                 code = DiscountCode.objects.create(
                     ticket=ticket,
-                    discount_percent=15,
+                    discount_percent=random.choice([10, 15, 20]),
                     is_active=True
                 )
                 codes.append(code)
@@ -450,7 +496,7 @@ class Command(BaseCommand):
 
         statuses = ['pending', 'paid', 'shipped', 'delivered', 'cancelled']
 
-        for i in range(count):
+        for _ in range(count):
             user = random.choice(users)
             days_ago = random.randint(0, 60)
             status = random.choice(statuses)
