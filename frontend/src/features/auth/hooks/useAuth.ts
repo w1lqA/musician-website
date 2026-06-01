@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/shared/api/auth';
 import { useAuthStore } from '@/features/auth/model/store';
 import { mapUserToUI } from '@/features/auth/lib/mapUser';
+import { tokenManager } from '@/shared/api/token-manager';
 
 export const useLogin = () => {
     const setAuth = useAuthStore((state) => state.setAuth);
@@ -27,6 +28,7 @@ export const useLogin = () => {
         },
     });
 };
+
 export const useRegister = () => {
     return useMutation({
         mutationFn: authApi.register,
@@ -40,12 +42,14 @@ export const useLogout = () => {
     return useMutation({
         mutationFn: () => authApi.logout(),
         onSuccess: () => {
+            tokenManager.clearTokens();
             logout();
             queryClient.clear();
         },
     });
 };
 
+// src/features/auth/hooks/useAuth.ts
 export const useMe = () => {
     const setUser = useAuthStore((state) => state.setUser);
     const accessToken = useAuthStore((state) => state.accessToken);
