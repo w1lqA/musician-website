@@ -1,3 +1,4 @@
+# merch/admin.py
 from django.contrib import admin
 from django import forms
 from django.utils.safestring import mark_safe
@@ -17,10 +18,17 @@ class SKUInline(admin.TabularInline):
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
     extra = 1
-    fields = ('image_url', 'display_order')
+    fields = ('image_preview', 'image', 'display_order')  # исправлено: убрали image_url, добавили image_preview
+    readonly_fields = ('image_preview',)
     ordering = ('display_order',)
     verbose_name = 'Изображение'
     verbose_name_plural = 'Изображения'
+
+    @admin.display(description='Превью')
+    def image_preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" width="80" height="80" style="object-fit: contain;" />')
+        return "Нет фото"
 
 
 @admin.register(Product)
@@ -76,7 +84,6 @@ class SKUForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Поля генерируются автоматически
         if 'sku_code' in self.fields:
             self.fields['sku_code'].required = False
         if 'display_name' in self.fields:
@@ -117,7 +124,6 @@ class SKUAdmin(admin.ModelAdmin):
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = ('product', 'display_order', 'image_preview')
     list_display_links = ('product',)
-    list_filter = ()
     search_fields = ('product__name',)
     raw_id_fields = ('product',)
     list_editable = ('display_order',)
@@ -127,5 +133,3 @@ class ProductImageAdmin(admin.ModelAdmin):
         if obj.image:
             return mark_safe(f'<img src="{obj.image.url}" width="50" height="50" style="object-fit: contain;" />')
         return "Нет фото"
-
-    image_preview.allow_tags = True
