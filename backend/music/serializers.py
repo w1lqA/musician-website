@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Release, Track
-from core.utils import get_absolute_url
 import json
 
 
@@ -11,13 +10,10 @@ class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = ['id', 'track_number', 'title', 'duration_seconds', 'duration', 'file']
-        extra_kwargs = {
-            'file': {'required': False, 'allow_null': True}
-        }
 
     def get_file(self, obj):
         if obj.file:
-            return obj.file.name
+            return obj.file.name  # "music/filename.wav"
         return ''
 
     def get_duration(self, obj):
@@ -27,39 +23,36 @@ class TrackSerializer(serializers.ModelSerializer):
             return f"{mins}:{secs:02d}"
         return "0:00"
 
+
 class ReleaseSerializer(serializers.ModelSerializer):
-    tracks = TrackSerializer(many=True, required=False)
+    tracks = TrackSerializer(many=True, required=False, read_only=True)
     type_display = serializers.SerializerMethodField(read_only=True)
     cover_url = serializers.SerializerMethodField()
 
-    def get_cover_url(self, obj):
-        if obj.cover:
-            return obj.cover.name
-        return ''
-
     class Meta:
         model = Release
-        fields = ['id', 'title', 'artist', 'type', 'type_display', 'release_date',
-                  'cover', 'cover_url', 'description', 'tracks', 'is_featured', 'created_at']
+        fields = [
+            'id', 'title', 'artist', 'type', 'type_display', 'release_date',
+            'cover', 'cover_url', 'description', 'tracks', 'is_featured', 'created_at',
+        ]
         read_only_fields = ('created_at',)
         extra_kwargs = {
-            'cover': {'write_only': True}
+            'cover': {'write_only': True, 'required': False},
         }
+
+    def get_cover_url(self, obj):
+        if obj.cover:
+            return obj.cover.name  # "covers/image.jpg"
+        return ''
 
     def get_type_display(self, obj):
         return obj.get_type_display()
 
-    def to_internal_value(self, data):
-        if 'tracks' in data and isinstance(data.get('tracks'), str):
-            try:
-                mutable = data.copy()
-                mutable['tracks'] = json.loads(data['tracks'])
-                data = mutable
-            except (json.JSONDecodeError, AttributeError):
-                pass
-        return super().to_internal_value(data)
-
     def _get_tracks_from_request(self):
+        """
+        Читаем треки напрямую из request, минуя валидацию DRF.
+        Файлы прикрепляем по индексу из request.FILES.
+        """
         request = self.context.get('request')
         if not request:
             return None
@@ -74,7 +67,7 @@ class ReleaseSerializer(serializers.ModelSerializer):
             except json.JSONDecodeError:
                 return None
         else:
-            tracks_data = raw_tracks
+            tracks_data = list(raw_tracks)
 
         for i, track_data in enumerate(tracks_data):
             file_key = f'track_file_{i}'
@@ -84,7 +77,6 @@ class ReleaseSerializer(serializers.ModelSerializer):
         return tracks_data
 
     def create(self, validated_data):
-        validated_data.pop('tracks', None)
         tracks_data = self._get_tracks_from_request() or []
 
         release = Release.objects.create(**validated_data)
@@ -94,7 +86,6 @@ class ReleaseSerializer(serializers.ModelSerializer):
         return release
 
     def update(self, instance, validated_data):
-        validated_data.pop('tracks', None)
         tracks_data = self._get_tracks_from_request()
 
         for attr, value in validated_data.items():
