@@ -95,9 +95,9 @@ export default function AdminReleasesPage() {
                                     {releases?.map((release) => (
                                         <tr key={release.id} className="border-b border-primary-black-300 hover:bg-primary-black-600 transition-colors">
                                             <td className="px-4 py-3">
-                                                {release.cover ? (
+                                                {release.cover_url ? (
                                                     <img
-                                                        src={getMediaUrl(release.cover)}
+                                                        src={getMediaUrl(release.cover_url)}
                                                         alt={release.title}
                                                         className="w-16 h-10 object-contain rounded"
                                                     />

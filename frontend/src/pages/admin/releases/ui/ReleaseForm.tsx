@@ -1,4 +1,4 @@
-// src/pages/admin/releases/components/ReleaseForm.tsx
+// src/pages/admin/releases/ui/ReleaseForm.tsx
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -43,10 +43,19 @@ interface ReleaseFormProps {
     onSubmit: (data: ReleaseFormValues) => void;
     isPending: boolean;
     submitLabel: string;
+    onDeleteTrack?: (trackId: string) => void;
+    isDeletingTrack?: boolean;
 }
 
-export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }: ReleaseFormProps) => {
-    const { register, control, handleSubmit, setValue, formState: { errors } } = useForm<ReleaseFormValues>({
+export const ReleaseForm = ({
+    defaultValues,
+    onSubmit,
+    isPending,
+    submitLabel,
+    onDeleteTrack,
+    isDeletingTrack,
+}: ReleaseFormProps) => {
+    const { register, control, handleSubmit, setValue, watch, formState: { errors } } = useForm<ReleaseFormValues>({
         resolver: zodResolver(releaseSchema),
         defaultValues: {
             title: '',
@@ -77,6 +86,10 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
         });
     };
 
+    const handleCoverChange = (file: File | undefined) => {
+        setValue('cover', file);
+    };
+
     const handleFileChange = async (index: number, file: File | undefined) => {
         if (!file) return;
 
@@ -85,11 +98,20 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
         try {
             const duration = await getAudioDuration(file);
             setValue(`tracks.${index}.duration_seconds`, duration);
+            setValue(`tracks.${index}.file`, file);
         } catch (error) {
             console.error('Ошибка получения длительности:', error);
         } finally {
             setProcessingTracks(prev => ({ ...prev, [index]: false }));
         }
+    };
+
+    const handleRemoveTrack = (index: number) => {
+        const trackId = watch(`tracks.${index}.id`);
+        if (trackId && onDeleteTrack) {
+            onDeleteTrack(trackId);
+        }
+        remove(index);
     };
 
     return (
@@ -112,7 +134,6 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                     options={typeOptions}
                     error={errors.type?.message}
                     {...register('type')}
-                    className='[&_select]:border-primary-white-600!'
                 />
                 <Input
                     label="Дата релиза"
@@ -136,7 +157,7 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                         type="file"
                         accept="image/*"
                         className="w-full bg-primary-black-500 border border-primary-black-300 h-10 text-primary-white-600 file:bg-accent-1 file:text-primary-white-600 file:border-0 file:h-full file:px-4 file:mr-4"
-                        {...register('cover')}
+                        onChange={(e) => handleCoverChange(e.target.files?.[0])}
                     />
                 </div>
                 <div className="flex items-center gap-4">
@@ -144,7 +165,8 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                         <input
                             type="checkbox"
                             className="w-4 h-4 accent-accent-1"
-                            {...register('is_featured')}
+                            checked={watch('is_featured')}
+                            onChange={(e) => setValue('is_featured', e.target.checked)}
                         />
                         <span className="text-caption-regular text-primary-white-400">
                             В рекомендациях
@@ -163,64 +185,67 @@ export const ReleaseForm = ({ defaultValues, onSubmit, isPending, submitLabel }:
                 </div>
 
                 <div className="space-y-3">
-                    {fields.map((field, index) => (
-                        <div key={field.id} className="bg-primary-black-600 border border-primary-black-300 p-4">
-                            <div className="grid grid-cols-1 tablet:grid-cols-12 gap-3">
-                                <div className="tablet:col-span-1">
-                                    <Input
-                                        type="number"
-                                        placeholder="№"
-                                        {...register(`tracks.${index}.track_number` as const, { valueAsNumber: true })}
-                                        error={errors.tracks?.[index]?.track_number?.message}
-                                    />
-                                </div>
-                                <div className="tablet:col-span-5">
-                                    <Input
-                                        placeholder="Название трека"
-                                        {...register(`tracks.${index}.title` as const)}
-                                        error={errors.tracks?.[index]?.title?.message}
-                                    />
-                                </div>
-                                <div className="tablet:col-span-5">
-                                    <div className="relative">
-                                        <input
-                                            type="file"
-                                            accept="audio/*"
-                                            className="w-full bg-primary-black-500 border border-primary-black-300 h-10 text-primary-white-600 file:bg-accent-1 file:text-primary-white-600 file:border-0 file:h-full file:px-4 file:mr-4"
-                                            {...register(`tracks.${index}.file` as const)}
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) {
-                                                    handleFileChange(index, file);
-                                                }
-                                                register(`tracks.${index}.file`).onChange(e);
-                                            }}
+                    {fields.map((field, index) => {
+                        const trackNumber = watch(`tracks.${index}.track_number`);
+                        const trackTitle = watch(`tracks.${index}.title`);
+                        const durationSeconds = watch(`tracks.${index}.duration_seconds`);
+
+                        return (
+                            <div key={field.id} className="bg-primary-black-600 border border-primary-black-300 p-4">
+                                <div className="grid grid-cols-1 tablet:grid-cols-12 gap-3">
+                                    <div className="tablet:col-span-1">
+                                        <Input
+                                            type="number"
+                                            placeholder="№"
+                                            value={trackNumber || ''}
+                                            onChange={(e) => setValue(`tracks.${index}.track_number`, parseInt(e.target.value) || 0)}
+                                            error={errors.tracks?.[index]?.track_number?.message}
                                         />
-                                        {processingTracks[index] && (
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                <Loader2 className="w-4 h-4 text-accent-1 animate-spin" />
-                                            </div>
+                                    </div>
+                                    <div className="tablet:col-span-5">
+                                        <Input
+                                            placeholder="Название трека"
+                                            value={trackTitle || ''}
+                                            onChange={(e) => setValue(`tracks.${index}.title`, e.target.value)}
+                                            error={errors.tracks?.[index]?.title?.message}
+                                        />
+                                    </div>
+                                    <div className="tablet:col-span-5">
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                accept="audio/*"
+                                                className="w-full bg-primary-black-500 border border-primary-black-300 h-10 text-primary-white-600 file:bg-accent-1 file:text-primary-white-600 file:border-0 file:h-full file:px-4 file:mr-4"
+                                                onChange={(e) => handleFileChange(index, e.target.files?.[0])}
+                                            />
+                                            {processingTracks[index] && (
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                    <Loader2 className="w-4 h-4 text-accent-1 animate-spin" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        {durationSeconds > 0 && (
+                                            <p className="text-caption-small text-primary-white-400 mt-1 ml-1">
+                                                {Math.floor(durationSeconds / 60)}:{String(durationSeconds % 60).padStart(2, '0')}
+                                            </p>
                                         )}
                                     </div>
+                                    <div className="tablet:col-span-1 flex items-center justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTrack(index)}
+                                            disabled={isDeletingTrack}
+                                            className="p-2 text-primary-white-400 hover:text-accent-1 transition-colors disabled:opacity-50"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="tablet:col-span-1 flex items-center justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => remove(index)}
-                                        className="p-2 text-primary-white-400 hover:text-accent-1 transition-colors"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            </div>
 
-                            {/* скрытое поле для duration_seconds */}
-                            <input
-                                type="hidden"
-                                {...register(`tracks.${index}.duration_seconds` as const, { valueAsNumber: true })}
-                            />
-                        </div>
-                    ))}
+                                <input type="hidden" value={durationSeconds || 0} />
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {fields.length === 0 && (

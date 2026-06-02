@@ -1,7 +1,8 @@
+// src/pages/admin/releases/edit/index.tsx
 import { Container } from '@/shared/ui/Container';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ReleaseForm, type ReleaseFormValues } from '../ui/ReleaseForm';
-import { useUpdateRelease } from '@/features/admin/hooks/useAdminReleases';
+import { useUpdateRelease, useDeleteTrack } from '@/features/admin/hooks/useAdminReleases';
 import { useReleaseRawById } from '@/entities/release/hooks/useReleaseQueries';
 import { QueryStateWrapper } from '@/shared/ui/feedback/QueryStateWrapper/QueryStateWrapper';
 import { ChevronLeft } from 'lucide-react';
@@ -14,6 +15,7 @@ export default function AdminReleaseEditPage() {
 
     const { data: release, isLoading, isError, error, refetch } = useReleaseRawById(id!);
     const { mutate: updateRelease, isPending } = useUpdateRelease();
+    const { mutate: deleteTrack, isPending: isDeletingTrack } = useDeleteTrack();
 
     const onSubmit = (data: ReleaseFormValues) => {
         if (!id) return;
@@ -35,11 +37,13 @@ export default function AdminReleaseEditPage() {
             id: track.id,
             track_number: track.track_number,
             title: track.title,
-            duration_seconds: (() => {
-                const parts = track.duration.split(':');
-                return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+            // Используем duration_seconds напрямую из DTO если есть,
+            // иначе парсим строку вида "3:05"
+            duration_seconds: track.duration_seconds ?? (() => {
+                const parts = track.duration.split(':').map(Number);
+                return (parts[0] ?? 0) * 60 + (parts[1] ?? 0);
             })(),
-            file: track.file,
+            file: undefined,
         })),
     } : {};
 
@@ -97,6 +101,8 @@ export default function AdminReleaseEditPage() {
                             onSubmit={onSubmit}
                             isPending={isPending}
                             submitLabel="Сохранить изменения"
+                            onDeleteTrack={(trackId) => deleteTrack(trackId)}
+                            isDeletingTrack={isDeletingTrack}
                         />
                     </div>
                 </QueryStateWrapper>

@@ -5,6 +5,7 @@ import { Button } from '@/shared/ui/Button';
 import { useScreenSize } from '@/shared/hooks/useScreenSize';
 import type { MusicItem } from '@/entities/release';
 import { usePlayerStore } from '@/widgets/music-player/model/playerStore';
+import { getMediaUrl } from '@/shared/lib/media';
 
 interface MusicCardProps {
     item: MusicItem;
@@ -48,7 +49,7 @@ export const MusicCard = ({ item, tracks = [] }: MusicCardProps) => {
             >
                 <div className="w-full [backface-visibility:hidden] print:[backface-visibility:visible]">
                     <img
-                        src={item.cover}
+                        src={getMediaUrl(item.cover)}
                         alt={item.title}
                         className="w-full h-auto block rounded-md print:max-w-[150px] print:mx-auto"
                     />
@@ -56,7 +57,7 @@ export const MusicCard = ({ item, tracks = [] }: MusicCardProps) => {
 
                 <div className="absolute inset-0 w-full h-full tablet:[transform:rotateY(180deg)] [backface-visibility:hidden] overflow-hidden rounded-md print:static print:[transform:none] print:relative print:mt-2">
                     <img
-                        src={item.cover}
+                        src={getMediaUrl(item.cover)}
                         alt=""
                         className="absolute inset-0 w-full h-full object-cover scale-x-[-1] brightness-70 tablet:brightness-30 print:hidden"
                     />
